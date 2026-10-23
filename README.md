@@ -14,10 +14,17 @@
 - 휴대폰 메일 앱 / 스타일을 지우는 메일 앱: 은박 없이 경품이 바로 보임
 - 웹 버전: 마우스나 손가락으로 은박을 직접 긁어서 공개
 
+## 연결 정보
+- 웹 페이지(GitHub Pages): https://happysnow-maker.github.io/Hanulhoe_10_YearEnd/ — 저장소 `happysnow-maker/Hanulhoe_10_YearEnd`
+- 응답 스프레드시트 「한울회 2026 송년회 응답」: https://drive.google.com/open?id=1Jzv1xwSGoWYb8pxDcd7dNLk4JXFZZeQGHWtZjLEhP8g
+- Apps Script(위 시트에 연결, happysnow@hanyang.ac.kr 소유): https://script.google.com/d/1kNMy9U87hhqqvvFaLiDuKaQQ37H4NM5cX290b1Gz3ZZvfKfhsZuHKnCm/edit
+- 웹앱(회신 카드 제출 주소): `https://script.google.com/macros/s/AKfycbyXlp68exXGGvA5yIy_M9yU_3msr-IBGQCzCTM0FhiYxkZUXO5rb1GmWcmvlAPJS8Zhdw/exec`
+- `apps_script/`는 clasp로 관리: `clasp --user hanulhoe push` 후 기존 배포를 새 버전으로 갱신
+  `clasp --user hanulhoe update-deployment AKfycbyXlp68exXGGvA5yIy_M9yU_3msr-IBGQCzCTM0FhiYxkZUXO5rb1GmWcmvlAPJS8Zhdw` (URL 유지)
+
 ## 발송 순서
-1. GitHub에 `Hanulhoe_10_YearEnd` 저장소를 만들고 `index.html`, `images/`를 올린 뒤 Pages 활성화
-2. 기존 스프레드시트의 Apps Script에 `Code.gs` 붙여넣기 → **배포 관리 → 기존 배포 수정 → 새 버전** (URL 유지)
-3. 스프레드시트에 `명단` 시트 생성: A 성명 · B 이메일 · C 캠퍼스(선택) · D 소속(선택)
-4. `sendTest` 실행 → 내 메일함에서 확인(폼 제출까지 테스트)
-5. `sendInvitations` 실행 → E열에 발송 결과 기록
-6. 11월 초 `sendReminderToNonResponders`로 미응답자에게 리마인더
+1. (최초 1회) Apps Script 편집기에서 `sendTest` 실행 → 권한 승인 → 내 메일함에서 확인(폼 제출까지 테스트)
+2. 스프레드시트에 `명단` 시트 생성: A 성명 · B 이메일 · C 캠퍼스(선택) · D 소속(선택)
+3. `sendInvitations` 실행 → E열에 발송 결과 기록
+4. 11월 초 `sendReminderToNonResponders`로 미응답자에게 리마인더
+5. `index.html`·`images/` 수정 시 GitHub에 다시 올려야 메일·웹에 반영됨
