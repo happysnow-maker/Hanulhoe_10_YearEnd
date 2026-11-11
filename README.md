@@ -27,4 +27,6 @@
 2. 스프레드시트에 `명단` 시트 생성: A 성명 · B 이메일 · C 캠퍼스(선택) · D 소속(선택)
 3. `sendInvitations` 실행 → E열에 발송 결과 기록
 4. 11월 초 `sendReminderToNonResponders`로 미응답자에게 리마인더
-5. `index.html`·`images/` 수정 시 GitHub에 다시 올려야 메일·웹에 반영됨
+5. 마감 후 후속 메일(`apps_script/Followup.gs`): `sendFollowupTests` → `previewFollowupTargets` →
+   `sendExtensionNotice`(미회신·불참자에게 11/17(화)까지 연장 안내, H열) · `sendThanksToAttendees`(참석자 감사, I열)
+6. `index.html`·`images/` 수정 시 GitHub에 다시 올려야 메일·웹에 반영됨
