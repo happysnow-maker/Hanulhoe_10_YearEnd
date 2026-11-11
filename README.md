@@ -28,5 +28,5 @@
 3. `sendInvitations` 실행 → E열에 발송 결과 기록
 4. 11월 초 `sendReminderToNonResponders`로 미응답자에게 리마인더
 5. 마감 후 후속 메일(`apps_script/Followup.gs`): `sendFollowupTests` → `previewFollowupTargets` →
-   `sendExtensionNotice`(미회신·불참자에게 11/17(화)까지 연장 안내, H열) · `sendThanksToAttendees`(참석자 감사, I열)
+   `sendExtensionNotice`(미회신·불참자에게 11/17(화)까지 연장 안내) · `sendThanksToAttendees`(참석자 감사) — 기록은 명단의 「연장안내 발송」「감사메일 발송」 열(없으면 맨 끝에 생성)
 6. `index.html`·`images/` 수정 시 GitHub에 다시 올려야 메일·웹에 반영됨
