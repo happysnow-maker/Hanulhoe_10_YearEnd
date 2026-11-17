@@ -37,7 +37,7 @@
 | `event_night.html` | 무대 진행 화면(16:9 슬라이드) — 표지 → 식순 → 순서별 화면, 사업보고·회장 선출·경품 추첨·기증자 촬영 연결 |
 | `vote.html` | 참석자 휴대폰용 회장 후보 추천·투표 (QR) — GitHub Pages에 올라가 있어야 QR이 동작 |
 | `event_print.html` | A4 1장 = A5 식순 2부 인쇄용 (여백 없음 · 배경 그래픽 켜기) |
-| `report/` | 사업보고 PDF를 이미지로 변환한 것 — 저장소에 올리지 않음(.gitignore) |
+| `report/` | 사업보고 PDF를 이미지로 변환한 것 (`tools/report_to_images.py`) — 행사용으로 임시 공개, 행사 후 내릴 예정 |
 | `images/donor/` | 기증자 배너 (총장님 · 연구부총장님 · 공과대학장님_변중무 · 산단장님_강현종) |
 | `apps_script/Event.gs` | 추천·투표·참석자 명단 API (`doGet`에 `action` 파라미터가 있으면 처리) |
 
