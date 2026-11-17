@@ -134,14 +134,19 @@ function api(params) {
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 let state = { phase: null, cands: [] }, choice = null, sending = false;
-const ballotKey = (cands) => 'voted_' + cands.map((c) => c.no + c.name).join('|');
+const ballotKey = (cands) => 'voted_' + (state.round || '') + '_' + cands.map((c) => c.no + c.name).join('|');
+const nomsKey = () => 'noms_' + (state.round || '');
 
 function show(id) {
   document.querySelectorAll('section').forEach((s) => s.classList.toggle('hide', s.id !== id));
 }
 function render() {
   const ph = state.phase;
-  if (ph === 'nominate') { $('#title').innerHTML = '차기 회장<br>후보 추천'; show('v-nom'); }
+  if (ph === 'nominate') {
+    $('#title').innerHTML = '차기 회장<br>후보 추천'; show('v-nom');
+    const done = JSON.parse(store.get(nomsKey()) || '[]');
+    $('#nDone').textContent = done.length ? '내가 추천한 분: ' + done.join(', ') : '';
+  }
   else if (ph === 'vote') {
     $('#title').innerHTML = '제42대 한울회<br>회장 투표';
     if (store.get(ballotKey(state.cands))) { show('v-voted'); return; }
@@ -178,14 +183,13 @@ $('#nomForm').addEventListener('submit', (e) => {
     if (d.ok) {
       $('#nMsg').textContent = '✓ ' + name + '님 추천이 접수되었습니다.'; $('#nMsg').className = 'msg ok';
       $('#nName').value = ''; $('#nAff').value = '';
-      const done = JSON.parse(store.get('noms') || '[]'); if (done.indexOf(name) < 0) done.push(name); store.set('noms', JSON.stringify(done));
+      const done = JSON.parse(store.get(nomsKey()) || '[]'); if (done.indexOf(name) < 0) done.push(name); store.set(nomsKey(), JSON.stringify(done));
       $('#nDone').textContent = '내가 추천한 분: ' + done.join(', ');
     } else if (d.error === 'closed') { $('#nMsg').textContent = '추천이 마감되었습니다.'; $('#nMsg').className = 'msg err'; state.phase = d.phase; render(); }
     else { $('#nMsg').textContent = d.error; $('#nMsg').className = 'msg err'; }
   }).catch(() => { $('#nMsg').textContent = '연결이 원활하지 않습니다. 다시 눌러 주세요.'; $('#nMsg').className = 'msg err'; })
     .finally(() => { sending = false; $('#nBtn').disabled = false; });
 });
-(function () { const done = JSON.parse(store.get('noms') || '[]'); if (done.length) $('#nDone').textContent = '내가 추천한 분: ' + done.join(', '); })();
 
 $('#vBtn').addEventListener('click', () => {
   if (sending || !choice) return;
