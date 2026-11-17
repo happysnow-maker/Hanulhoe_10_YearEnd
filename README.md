@@ -30,3 +30,19 @@
 5. 마감 후 후속 메일(`apps_script/Followup.gs`): `sendFollowupTests` → `previewFollowupTargets` →
    `sendExtensionNotice`(미회신·불참자에게 11/17(화)까지 연장 안내) · `sendThanksToAttendees`(참석자 감사) — 기록은 명단의 「연장안내 발송」「감사메일 발송」 열(없으면 맨 끝에 생성)
 6. `index.html`·`images/` 수정 시 GitHub에 다시 올려야 메일·웹에 반영됨
+
+## 11/25 송년의 밤 당일 진행
+| 파일 | 용도 |
+|---|---|
+| `event_night.html` | 무대 진행 화면(16:9 슬라이드) — 표지 → 식순 → 순서별 화면, 사업보고·회장 선출·경품 추첨·기증자 촬영 연결 |
+| `vote.html` | 참석자 휴대폰용 회장 후보 추천·투표 (QR) — GitHub Pages에 올라가 있어야 QR이 동작 |
+| `event_print.html` | A4 1장 = A5 식순 2부 인쇄용 (여백 없음 · 배경 그래픽 켜기) |
+| `report/` | 사업보고 PDF를 이미지로 변환한 것 — 저장소에 올리지 않음(.gitignore) |
+| `images/donor/` | 기증자 배너 (총장님 · 연구부총장님 · 공과대학장님_변중무 · 산단장님_강현종) |
+| `apps_script/Event.gs` | 추천·투표·참석자 명단 API (`doGet`에 `action` 파라미터가 있으면 처리) |
+
+- 투표 API는 회신 폼과 **별도 배포**: `https://script.google.com/macros/s/AKfycbzXL3KEjGZkIJPbCzCOaVViSlhsfw-ZXD_N_VG9bIexXPWnYCHa9p14g_OgXdjm8bkQCw/exec`
+  Event.gs 수정 후: `clasp --user hanulhoe push` → `clasp --user hanulhoe update-deployment AKfycbzXL3KEjGZkIJPbCzCOaVViSlhsfw-ZXD_N_VG9bIexXPWnYCHa9p14g_OgXdjm8bkQCw`
+- 관리자 키는 `apps_script/Event.gs`의 `EVENT.ADMIN_KEY` — 진행 화면 ⚙ 설정에 한 번 입력
+- 조작: → / PageDown / Space 다음 · ← 이전 · Enter 연결 자료 · Esc 식순으로 · F 전체화면 · 경품 화면에서 Space = 한 명 추첨
+- 리허설 후 ⚙ 설정 → 「경품 추첨 기록 초기화」「회장 추천·투표 초기화」

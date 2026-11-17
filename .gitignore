@@ -2,3 +2,7 @@ share/
 _preview.html
 apps_script/
 tools/
+
+# 사업보고(회원 이름·회계 포함) — 진행 노트북에서 로컬로만 사용
+report/
+제41대_한울회_사업보고_*

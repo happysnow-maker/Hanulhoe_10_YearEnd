@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>송년의 밤 식순 인쇄</title>
+<!-- A4 가로 1장 = 세로형 식순(A5 세로 148×210mm) 2부. 가운데 점선을 따라 잘라 테이블에 비치합니다.
+     인쇄 설정: 용지 A4 · 방향 가로 · 여백 없음 · 배율 100% · 배경 그래픽 켜기 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Serif+KR:wght@400;600;700;900&family=Pinyon+Script&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#123527;--deep:#0b2219;--gold:#a8812f;--gold-l:#c9a24a;--ink:#24342c;--mist:#6d7d73;--paper:#fffdf8}
+body{background:#5d6661;font-family:'Noto Serif KR',serif;color:var(--ink);font-variant-numeric:lining-nums;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{width:297mm;height:210mm;margin:12mm auto;background:#fff;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.35);overflow:hidden}
+.cut{position:absolute;top:0;bottom:0;left:148.5mm;border-left:.3mm dashed #b9b9b9}
+.cut::after{content:'✂';position:absolute;top:4mm;left:-2.4mm;font-size:4mm;color:#b9b9b9;background:#fff;padding:1mm 0;transform:rotate(90deg)}
+.card{position:absolute;top:0;width:148.5mm;height:210mm;padding:7mm}
+.card.a{left:0}.card.b{left:148.5mm}
+.in{position:relative;width:100%;height:100%;background:var(--paper);border:.5mm solid var(--gold);padding:1.6mm}
+.in2{position:relative;width:100%;height:100%;border:.2mm solid rgba(168,129,47,.55);display:flex;flex-direction:column;overflow:hidden}
+.corner{position:absolute;width:8mm;height:8mm;color:var(--gold)}
+.corner.tl{left:1.2mm;top:1.2mm}.corner.tr{right:1.2mm;top:1.2mm;transform:scaleX(-1)}
+
+.top{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 10mm}
+.ornament{width:10mm;height:21mm;color:var(--gold);margin-top:0}
+.kick{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:7pt;letter-spacing:.38em;text-transform:uppercase;color:var(--gold)}
+.top .kick{margin-top:2.6mm}
+h1{font-size:25pt;font-weight:900;color:var(--green);margin-top:1.8mm;letter-spacing:-.01em;line-height:1.15}
+.script{font-family:'Pinyon Script',cursive;color:var(--gold);font-size:15pt;line-height:1;margin-top:1.6mm}
+.meta{font-family:'Noto Sans KR',sans-serif;font-size:7.4pt;color:var(--mist);margin-top:3mm;line-height:1.6}
+.meta b{color:var(--ink);font-weight:500}
+.div{display:flex;align-items:center;gap:2mm;color:var(--gold);margin:6mm 0 3.4mm;font-size:7pt;width:100%}
+.div::before,.div::after{content:'';height:.2mm;flex:1;background:linear-gradient(90deg,rgba(168,129,47,.1),var(--gold))}
+.div::after{transform:scaleX(-1)}
+ol{list-style:none;width:100%;margin-top:2mm;text-align:left}
+ol li{display:flex;align-items:baseline;gap:4mm;padding:3.3mm 1mm;border-bottom:.2mm solid rgba(168,129,47,.28)}
+ol li:last-child{border-bottom:0}
+ol .n{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;font-size:12.5pt;color:var(--gold);width:6.5mm;line-height:1;flex:none}
+ol .t{font-size:11.4pt;font-weight:600;color:var(--green);letter-spacing:.01em;word-break:keep-all}
+ol .q{margin-left:auto;font-family:'Noto Sans KR',sans-serif;font-size:6.2pt;color:var(--gold);white-space:nowrap}
+
+.bot{background:var(--deep);color:#f7f0e1;display:flex;align-items:center;gap:5mm;padding:5mm 7mm 5.4mm;position:relative}
+.bot::before{content:'';position:absolute;inset:1.8mm;border:.2mm solid rgba(201,162,74,.5);pointer-events:none}
+.qr{width:27mm;height:27mm;background:#fff;padding:1.3mm;border:.3mm solid var(--gold-l);flex:none}
+.qr svg{width:100%;height:100%;display:block}
+.bot .kick{color:var(--gold-l);font-size:6.2pt;letter-spacing:.3em}
+.bot h2{font-size:11pt;font-weight:700;color:#efd99f;margin-top:1mm;line-height:1.4}
+.bot p{font-family:'Noto Sans KR',sans-serif;font-size:6.6pt;line-height:1.6;color:#cbd6cf;margin-top:1.6mm;word-break:keep-all}
+.bot p b{color:#efd99f;font-weight:500}
+
+.tools{position:fixed;top:14px;right:16px;display:flex;gap:10px;font-family:'Noto Sans KR',sans-serif}
+.tools button{font:inherit;font-size:14px;padding:10px 18px;border-radius:30px;border:0;background:#efd99f;color:#1b1405;font-weight:700;cursor:pointer}
+.tools span{color:#e8efe9;font-size:12.5px;align-self:center;max-width:320px;line-height:1.5}
+@media print{body{background:none}.sheet{margin:0;box-shadow:none}.tools{display:none}}
+</style>
+</head>
+<body>
+<div class="tools"><span>인쇄 설정: A4 · <b>가로</b> · 여백 없음 · 배율 100% · 배경 그래픽 켜기</span><button onclick="print()">🖨 인쇄</button></div>
+
+<template id="tpl">
+  <div class="in"><div class="in2">
+    <svg class="corner tl" viewBox="0 0 40 40" fill="none" stroke="currentColor"><path d="M1 24V1h23" stroke-width="1.6"/><path d="M6 15V6h9" stroke-width=".8"/><circle cx="10.5" cy="10.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <svg class="corner tr" viewBox="0 0 40 40" fill="none" stroke="currentColor"><path d="M1 24V1h23" stroke-width="1.6"/><path d="M6 15V6h9" stroke-width=".8"/><circle cx="10.5" cy="10.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <div class="top">
+      <svg class="ornament" viewBox="0 0 52 110" fill="none" stroke="currentColor">
+        <path d="M26 0v42" stroke-width="1.4"/><rect x="21.5" y="42" width="9" height="6" rx="1" fill="currentColor" stroke="none"/>
+        <circle cx="26" cy="72" r="22" stroke-width="1.4"/><circle cx="26" cy="72" r="17.5" stroke-width=".6" opacity=".6"/>
+        <path d="M26 60l3 8.3 8.8.2-7 5.3 2.5 8.5L26 77.3l-7.3 5 2.5-8.5-7-5.3 8.8-.2z" fill="currentColor" stroke="none"/>
+      </svg>
+      <div class="kick">The 41st Hanulhoe · Year-End Gala</div>
+      <h1>2026 송년의 밤</h1>
+      <div class="script">Season of Gratitude</div>
+      <div class="meta"><b>2026. 11. 25 (수) 오후 6시 30분</b><br>이비스 스타일 앰배서더 서울 명동 21층 르스타일</div>
+      <div class="div">✦</div>
+      <div class="kick">Programme</div>
+      <ol class="prog"></ol>
+    </div>
+    <div class="bot">
+      <div class="qr"></div>
+      <div>
+        <div class="kick">Your Vote</div>
+        <h2>제42대 한울회<br>차기 회장 추천 · 투표</h2>
+        <p>사회자 안내에 따라 <b>휴대폰 카메라로<br>QR을 스캔</b>해 참여해 주세요.</p>
+      </div>
+    </div>
+  </div></div>
+</template>
+
+<div class="sheet">
+  <div class="card a"></div>
+  <div class="cut"></div>
+  <div class="card b"></div>
+</div>
+
+<script>
+const VOTE_URL = 'https://happysnow-maker.github.io/Hanulhoe_10_YearEnd/vote.html';
+const AGENDA = [
+  ['개회 및 환영 인사', ''],
+  ['2026 사업 및 회계 보고', ''],
+  ['2027 제42대 한울회<br>차기 회장 선출', 'QR 참여'],
+  ['경품 추첨', ''],
+  ['폐회', ''],
+];
+let svg = '';
+try { const q = qrcode(0, 'M'); q.addData(VOTE_URL); q.make(); svg = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); } catch (e) { svg = '<p style="font-size:7pt;color:#900">QR 오류</p>'; }
+document.querySelectorAll('.card').forEach((card) => {
+  card.appendChild(document.getElementById('tpl').content.cloneNode(true));
+  card.querySelector('.prog').innerHTML = AGENDA.map((a, i) =>
+    `<li><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="t">${a[0]}</span>${a[1] ? `<span class="q">${a[1]} ›</span>` : ''}</li>`).join('');
+  card.querySelector('.qr').innerHTML = svg;
+});
+</script>
+</body>
+</html>

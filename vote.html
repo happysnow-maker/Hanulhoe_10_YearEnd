@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b2219">
+<title>한울회 차기 회장 추천 · 투표</title>
+<!-- 2026 송년의 밤 현장 참여 페이지 (QR) — 진행 화면에서 단계를 바꾸면 자동으로 추천 → 투표 화면으로 바뀝니다 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Noto+Serif+KR:wght@400;600;700&family=Pinyon+Script&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg0:#050f0b;--bg1:#0b2219;--gold:#c9a24a;--gold-l:#efd99f;--ivory:#f7f0e1;--mist:#a9bcb0;--line:rgba(201,162,74,.4);--wine:#7f1d2d}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{font-variant-numeric:lining-nums;font-family:'Noto Sans KR','Malgun Gothic',sans-serif;color:var(--ivory);-webkit-font-smoothing:antialiased;
+  background:radial-gradient(120% 60% at 50% 0%,#1d4a39 0%,var(--bg1) 45%,var(--bg0) 100%) fixed;min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;padding:28px 16px calc(40px + env(safe-area-inset-bottom))}
+.frame{border:1px solid var(--line);padding:6px}
+.inner{border:1px solid rgba(201,162,74,.18);padding:30px 20px 28px;text-align:center}
+.kicker{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.38em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:'Noto Serif KR',serif;font-size:28px;font-weight:700;margin-top:10px;line-height:1.35;word-break:keep-all;
+  background:linear-gradient(100deg,#b0842d,#f4e3ad 35%,#c99a3e 60%,#fbefc6 85%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.script{font-family:'Pinyon Script',cursive;color:var(--gold-l);font-size:30px;margin-top:2px}
+.div{display:flex;align-items:center;gap:10px;justify-content:center;margin:18px 0;color:var(--gold)}
+.div::before,.div::after{content:'';height:1px;width:70px;background:linear-gradient(90deg,transparent,var(--gold))}
+.div::after{transform:scaleX(-1)}
+p.lead{font-family:'Noto Serif KR',serif;font-size:16.5px;line-height:1.75;color:var(--ivory);word-break:keep-all}
+p.sub{font-size:13.5px;color:var(--mist);line-height:1.7;margin-top:8px;word-break:keep-all}
+label{display:block;text-align:left;font-size:13px;color:var(--gold-l);margin:18px 2px 6px;letter-spacing:.04em}
+input[type=text]{width:100%;font:inherit;font-size:17px;padding:14px 14px;border-radius:10px;border:1px solid rgba(201,162,74,.35);background:rgba(0,0,0,.25);color:#fff;outline:none}
+input[type=text]:focus{border-color:var(--gold)}
+.btn{display:block;width:100%;margin-top:22px;padding:16px;border:0;border-radius:999px;font:inherit;font-size:17px;font-weight:700;letter-spacing:.04em;cursor:pointer;
+  background:linear-gradient(180deg,#f0d995,#c9a24a);color:#1b1405;box-shadow:0 8px 24px rgba(201,162,74,.25)}
+.btn:disabled{opacity:.45}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--gold-l);box-shadow:none;font-weight:500}
+.cands{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.cand{display:flex;align-items:center;gap:16px;padding:16px 18px;border:1px solid rgba(201,162,74,.3);border-radius:12px;text-align:left;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02)}
+.cand .no{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:30px;color:var(--gold);width:34px;text-align:center;flex:none}
+.cand .nm{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700}
+.cand .af{font-size:12.5px;color:var(--mist);margin-top:2px}
+.cand .ck{margin-left:auto;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(201,162,74,.5);flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;color:transparent}
+.cand.on{border-color:var(--gold);background:rgba(201,162,74,.14)}
+.cand.on .ck{background:var(--gold);color:#1b1405;border-color:var(--gold)}
+.msg{margin-top:14px;font-size:14px;min-height:1.4em}
+.msg.ok{color:#a6e3bf}.msg.err{color:#f39aa6}
+.seal{width:84px;height:84px;margin:6px auto 0;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--gold-l)}
+.foot{text-align:center;font-family:'Cormorant Garamond',serif;letter-spacing:.3em;font-size:12px;color:rgba(201,162,74,.6);margin-top:22px;text-transform:uppercase}
+.hide{display:none}
+.spin{width:28px;height:28px;border:2px solid rgba(201,162,74,.25);border-top-color:var(--gold);border-radius:50%;margin:16px auto 0;animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="frame"><div class="inner">
+    <div class="kicker">Hanulhoe · Year-End Gala</div>
+    <h1 id="title">제42대 한울회<br>차기 회장 선출</h1>
+    <div class="script">Season of Gratitude</div>
+    <div class="div">✦</div>
+
+    <!-- 불러오는 중 -->
+    <section id="v-load"><p class="sub">연결하는 중입니다…</p><div class="spin"></div></section>
+
+    <!-- 대기 -->
+    <section id="v-idle" class="hide">
+      <p class="lead">잠시 후 차기 회장 후보 추천이 시작됩니다.</p>
+      <p class="sub">사회자의 안내가 있으면 이 화면이 자동으로 바뀝니다.<br>화면을 켜 둔 채 기다려 주세요.</p>
+      <div class="spin"></div>
+    </section>
+
+    <!-- 추천 -->
+    <section id="v-nom" class="hide">
+      <p class="lead">한울회를 이끌어 주실<br>분을 추천해 주세요.</p>
+      <p class="sub">여러 분을 추천하셔도 됩니다. 추천은 익명으로 집계됩니다.</p>
+      <form id="nomForm" autocomplete="off">
+        <label for="nName">추천할 분의 성명 *</label>
+        <input type="text" id="nName" maxlength="20" placeholder="예) 홍길동" required>
+        <label for="nAff">소속 (선택)</label>
+        <input type="text" id="nAff" maxlength="40" placeholder="예) 서울 총무처 인사팀">
+        <button class="btn" id="nBtn" type="submit">추천하기</button>
+      </form>
+      <div class="msg" id="nMsg"></div>
+      <div id="nDone" class="sub"></div>
+    </section>
+
+    <!-- 투표 -->
+    <section id="v-vote" class="hide">
+      <p class="lead">한 분을 선택해 주세요.</p>
+      <p class="sub">1인 1표 · 무기명 투표입니다. 제출 후에는 바꿀 수 없습니다.</p>
+      <div class="cands" id="cands"></div>
+      <button class="btn" id="vBtn" disabled>투표하기</button>
+      <div class="msg" id="vMsg"></div>
+    </section>
+
+    <!-- 투표 완료 -->
+    <section id="v-voted" class="hide">
+      <div class="seal">✓</div>
+      <p class="lead" style="margin-top:16px">소중한 한 표가<br>접수되었습니다.</p>
+      <p class="sub">개표 결과는 무대 화면에서 발표됩니다.</p>
+    </section>
+
+    <!-- 마감 -->
+    <section id="v-closed" class="hide">
+      <p class="lead">투표가 마감되었습니다.</p>
+      <p class="sub">참여해 주셔서 감사합니다.<br>결과는 무대 화면에서 함께 확인해 주세요.</p>
+    </section>
+  </div></div>
+  <div class="foot">The 41st Hanulhoe</div>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbzXL3KEjGZkIJPbCzCOaVViSlhsfw-ZXD_N_VG9bIexXPWnYCHa9p14g_OgXdjm8bkQCw/exec';
+const $ = (s) => document.querySelector(s);
+const store = {
+  get(k) { try { return localStorage.getItem('hanulvote_' + k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem('hanulvote_' + k, v); } catch (e) {} },
+};
+let dev = store.get('dev');
+if (!dev) { dev = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2)); store.set('dev', dev); }
+
+function api(params) {
+  return new Promise((resolve, reject) => {
+    const cb = '__cb' + Date.now() + Math.floor(Math.random() * 1e6);
+    const s = document.createElement('script');
+    const done = () => { clearTimeout(t); window[cb] = function () {}; s.remove(); };
+    const t = setTimeout(() => { done(); reject(new Error('timeout')); }, 20000);
+    window[cb] = (d) => { done(); resolve(d); };
+    s.onerror = () => { done(); reject(new Error('network')); };
+    s.src = API + '?' + new URLSearchParams(Object.assign({}, params, { callback: cb, _: Date.now() }));
+    document.head.appendChild(s);
+  });
+}
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+let state = { phase: null, cands: [] }, choice = null, sending = false;
+const ballotKey = (cands) => 'voted_' + cands.map((c) => c.no + c.name).join('|');
+
+function show(id) {
+  document.querySelectorAll('section').forEach((s) => s.classList.toggle('hide', s.id !== id));
+}
+function render() {
+  const ph = state.phase;
+  if (ph === 'nominate') { $('#title').innerHTML = '차기 회장<br>후보 추천'; show('v-nom'); }
+  else if (ph === 'vote') {
+    $('#title').innerHTML = '제42대 한울회<br>회장 투표';
+    if (store.get(ballotKey(state.cands))) { show('v-voted'); return; }
+    show('v-vote');
+    const sig = JSON.stringify(state.cands);
+    if ($('#cands').dataset.sig !== sig) {
+      $('#cands').dataset.sig = sig; choice = null; $('#vBtn').disabled = true;
+      $('#cands').innerHTML = state.cands.map((c) => `<div class="cand" data-no="${c.no}"><span class="no">${c.no}</span><div><div class="nm">${esc(c.name)}</div>${c.aff ? `<div class="af">${esc(c.aff)}</div>` : ''}</div><span class="ck">✓</span></div>`).join('');
+      document.querySelectorAll('.cand').forEach((el) => el.onclick = () => {
+        choice = +el.dataset.no;
+        document.querySelectorAll('.cand').forEach((x) => x.classList.toggle('on', x === el));
+        $('#vBtn').disabled = false;
+      });
+    }
+  }
+  else if (ph === 'closed') { $('#title').innerHTML = '제42대 한울회<br>회장 투표'; show(store.get(ballotKey(state.cands)) ? 'v-voted' : 'v-closed'); }
+  else { $('#title').innerHTML = '제42대 한울회<br>차기 회장 선출'; show('v-idle'); }
+}
+
+function poll() {
+  if (document.hidden) { setTimeout(poll, 3000); return; }
+  api({ action: 'state' }).then((d) => {
+    if (d.ok) { state = d; render(); }
+  }).catch(() => {}).finally(() => setTimeout(poll, 5000 + Math.random() * 2500));
+}
+
+$('#nomForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (sending) return;
+  const name = $('#nName').value.trim(), aff = $('#nAff').value.trim();
+  if (!name) return;
+  sending = true; $('#nBtn').disabled = true; $('#nMsg').textContent = '보내는 중…'; $('#nMsg').className = 'msg';
+  api({ action: 'nominate', name, aff, dev }).then((d) => {
+    if (d.ok) {
+      $('#nMsg').textContent = '✓ ' + name + '님 추천이 접수되었습니다.'; $('#nMsg').className = 'msg ok';
+      $('#nName').value = ''; $('#nAff').value = '';
+      const done = JSON.parse(store.get('noms') || '[]'); if (done.indexOf(name) < 0) done.push(name); store.set('noms', JSON.stringify(done));
+      $('#nDone').textContent = '내가 추천한 분: ' + done.join(', ');
+    } else if (d.error === 'closed') { $('#nMsg').textContent = '추천이 마감되었습니다.'; $('#nMsg').className = 'msg err'; state.phase = d.phase; render(); }
+    else { $('#nMsg').textContent = d.error; $('#nMsg').className = 'msg err'; }
+  }).catch(() => { $('#nMsg').textContent = '연결이 원활하지 않습니다. 다시 눌러 주세요.'; $('#nMsg').className = 'msg err'; })
+    .finally(() => { sending = false; $('#nBtn').disabled = false; });
+});
+(function () { const done = JSON.parse(store.get('noms') || '[]'); if (done.length) $('#nDone').textContent = '내가 추천한 분: ' + done.join(', '); })();
+
+$('#vBtn').addEventListener('click', () => {
+  if (sending || !choice) return;
+  const c = state.cands.find((x) => x.no === choice);
+  if (!confirm(c.no + '번 ' + c.name + '님께 투표할까요?')) return;
+  sending = true; $('#vBtn').disabled = true; $('#vMsg').textContent = '보내는 중…'; $('#vMsg').className = 'msg';
+  api({ action: 'vote', no: choice, dev }).then((d) => {
+    if (d.ok || d.error === 'already') { store.set(ballotKey(state.cands), '1'); render(); }
+    else if (d.error === 'closed') { state.phase = d.phase; render(); }
+    else { $('#vMsg').textContent = d.error; $('#vMsg').className = 'msg err'; $('#vBtn').disabled = false; }
+  }).catch(() => { $('#vMsg').textContent = '연결이 원활하지 않습니다. 다시 눌러 주세요.'; $('#vMsg').className = 'msg err'; $('#vBtn').disabled = false; })
+    .finally(() => { sending = false; });
+});
+
+poll();
+</script>
+</body>
+</html>

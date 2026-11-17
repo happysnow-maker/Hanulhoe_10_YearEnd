@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 한울회 송년의 밤</title>
+<!--
+  ▣ 2026.11.25(수) 제41대 한울회 정기총회 · 송년의 밤 — 무대 진행 화면 (노트북 → 프로젝터)
+  ▣ 조작: → / PageDown / Space = 다음 · ← / PageUp = 이전 · Enter = 연결 자료 열기 · Esc = 식순으로 · F = 전체화면
+          경품 추첨 화면에서는 Space / PageDown = 한 명 추첨 (다 뽑으면 다음 경품)
+  ▣ 화면 아래쪽에 마우스를 올리면 메뉴, ⚙ 설정에서 관리자 키 · 추첨 명단 · 경품 순서를 정합니다.
+  ▣ 회장 추천·투표는 Apps Script(apps_script/Event.gs) — 참석자는 vote.html(QR)로 참여
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+KR:wght@300;400;600;700;900&family=Pinyon+Script&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root{
+  --bg0:#040d0a; --bg1:#0b2219; --bg2:#123527;
+  --gold:#c9a24a; --gold-l:#efd99f; --gold-d:#8a6624;
+  --ivory:#f7f0e1; --mist:#a9bcb0; --wine:#7f1d2d; --wine-l:#b23a4c;
+  --line:rgba(201,162,74,.45); --line2:rgba(201,162,74,.2);
+  --serif:'Noto Serif KR','Nanum Myeongjo',serif;
+  --latin:'Cormorant Garamond','Noto Serif KR',serif;
+  --script:'Pinyon Script',cursive;
+  --sans:'Noto Sans KR','Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#000}
+body{font-family:var(--serif);color:var(--ivory);-webkit-font-smoothing:antialiased;font-variant-numeric:lining-nums}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── 16:9 무대 (1920×1080 기준으로 화면에 맞춰 확대·축소) ── */
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:50% 50%;overflow:hidden;
+  background:
+    radial-gradient(1400px 820px at 50% -8%,rgba(46,104,80,.55),transparent 62%),
+    radial-gradient(900px 600px at 50% 118%,rgba(127,29,45,.20),transparent 70%),
+    linear-gradient(180deg,var(--bg1),var(--bg0));}
+#stage::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);z-index:1}
+#snow{position:absolute;inset:0;z-index:2;pointer-events:none}
+.frame{position:absolute;inset:44px;border:1px solid var(--line);pointer-events:none;z-index:3}
+.frame::before{content:'';position:absolute;inset:12px;border:1px solid var(--line2)}
+.corner{position:absolute;width:120px;height:120px;color:var(--gold)}
+.corner.tl{left:-1px;top:-1px}.corner.tr{right:-1px;top:-1px;transform:scaleX(-1)}
+.corner.bl{left:-1px;bottom:-1px;transform:scaleY(-1)}.corner.br{right:-1px;bottom:-1px;transform:scale(-1,-1)}
+
+.scene{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  opacity:0;visibility:hidden;transition:opacity .7s ease,visibility 0s linear .7s;padding:120px 160px}
+.scene.on{opacity:1;visibility:visible;transition:opacity .7s ease}
+.scene.on .rise{animation:rise 1s cubic-bezier(.2,.7,.2,1) both}
+.scene.on .rise.d1{animation-delay:.12s}.scene.on .rise.d2{animation-delay:.24s}.scene.on .rise.d3{animation-delay:.36s}.scene.on .rise.d4{animation-delay:.5s}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+
+.foil{background:linear-gradient(100deg,#a87a24 0%,#f4e3ad 24%,#c99a3e 46%,#fbefc6 64%,#b0842d 84%,#e9cf8a 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 18px rgba(201,162,74,.22))}
+.kicker{font-variant-numeric:lining-nums;font-family:var(--latin);font-weight:500;font-size:30px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold)}
+.script{font-family:var(--script);color:var(--gold-l);font-weight:400}
+.divider{display:block;width:520px;height:34px;color:var(--gold);margin:34px auto}
+.muted{color:var(--mist)}
+
+/* 표지 */
+#cover .bauble{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:250px;color:var(--gold)}
+#cover .kicker{margin-top:70px}
+#cover h1{font-family:var(--serif);font-weight:700;font-size:168px;line-height:1.08;letter-spacing:-.01em;margin-top:26px}
+#cover .script{font-size:96px;margin-top:-30px;transform:rotate(-3deg)}
+#cover .when{font-family:var(--latin);font-size:40px;letter-spacing:.24em;color:var(--ivory)}
+#cover .where{font-size:30px;font-weight:300;color:var(--mist);margin-top:14px;letter-spacing:.06em}
+
+/* 식순 */
+#program h2{font-size:84px;font-weight:700;letter-spacing:.3em;margin:8px 0 0 .3em}
+#program ol{list-style:none;width:1240px;margin-top:40px}
+#program li{display:flex;align-items:center;gap:44px;padding:24px 34px;border-bottom:1px solid var(--line2);cursor:pointer;transition:background .3s}
+#program li:first-child{border-top:1px solid var(--line2)}
+#program li:hover{background:rgba(201,162,74,.07)}
+#program li .n{font-family:var(--latin);font-style:italic;font-size:62px;color:var(--gold);width:90px;text-align:left;line-height:1}
+#program li .t{font-size:52px;font-weight:600;text-align:left;flex:1;letter-spacing:.01em}
+#program li .go{font-family:var(--latin);font-size:24px;letter-spacing:.3em;color:var(--gold);opacity:.8;text-transform:uppercase}
+#program li.done .t,#program li.done .n{opacity:.38}
+#program li.cur{background:linear-gradient(90deg,rgba(201,162,74,.16),rgba(201,162,74,.02))}
+
+/* 순서 슬라이드 */
+.item .num{font-family:var(--latin);font-style:italic;font-size:240px;line-height:.9;color:transparent;-webkit-text-stroke:1.5px rgba(201,162,74,.55)}
+.item .kicker{margin-top:18px}
+.item h2{font-size:126px;font-weight:700;line-height:1.22;letter-spacing:-.005em;margin-top:30px;word-break:keep-all}
+.item h2.long{font-size:104px}
+.cta{display:inline-flex;align-items:center;gap:22px;margin-top:64px;padding:24px 56px;border:1px solid var(--gold);border-radius:999px;
+  font-family:var(--serif);font-size:34px;font-weight:600;color:var(--gold-l);letter-spacing:.06em;background:rgba(201,162,74,.06);transition:all .3s}
+.cta:hover{background:var(--gold);color:#1a1405}
+.cta small{font-family:var(--latin);font-size:22px;letter-spacing:.25em;opacity:.75}
+
+/* 마무리 */
+#closing .script{font-size:150px;line-height:1.15}
+#closing h2{font-size:74px;font-weight:600;margin-top:34px;letter-spacing:.06em}
+#closing .sign{font-size:34px;color:var(--gold);letter-spacing:.4em;margin-top:40px;font-weight:600}
+
+/* ── 사업보고 뷰어 ── */
+#report{padding:0;background:#071510}
+#report img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#report .pg{position:absolute;right:70px;bottom:52px;font-family:var(--latin);font-size:26px;letter-spacing:.2em;color:rgba(255,255,255,.55);z-index:2;
+  background:rgba(0,0,0,.25);padding:6px 18px;border-radius:30px}
+
+/* ── 공통 버튼 ── */
+.btn{display:inline-flex;align-items:center;gap:14px;padding:18px 40px;border-radius:999px;font-family:var(--serif);font-size:28px;font-weight:600;letter-spacing:.04em;
+  border:1px solid var(--gold);color:var(--gold-l);background:rgba(201,162,74,.06);transition:all .25s}
+.btn:hover{background:rgba(201,162,74,.18)}
+.btn.solid{background:linear-gradient(180deg,#f0d995,#c9a24a);color:#1b1405;border-color:#e2c47a;box-shadow:0 10px 34px rgba(201,162,74,.28)}
+.btn.solid:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:rgba(201,162,74,.35);color:var(--mist);font-size:24px;padding:14px 30px}
+.btn:disabled{opacity:.35;pointer-events:none}
+.btnrow{display:flex;gap:20px;justify-content:center;align-items:center;flex-wrap:wrap}
+
+/* ── 회장 선출 ── */
+#elect{justify-content:flex-start;padding:120px 150px 110px}
+.steps{display:flex;gap:16px;justify-content:center;margin-top:20px}
+.steps button{font-family:var(--serif);font-size:24px;letter-spacing:.12em;padding:10px 30px;border-radius:999px;border:1px solid var(--line2);color:var(--mist)}
+.steps button.on{border-color:var(--gold);color:var(--gold-l);background:rgba(201,162,74,.12)}
+#elect h2{font-size:68px;font-weight:700;margin-top:14px;letter-spacing:.04em}
+.elbody{display:flex;gap:70px;width:100%;flex:1;margin-top:34px;align-items:stretch;min-height:0}
+.qrcard{width:420px;flex:none;align-self:flex-start;background:var(--ivory);color:#16271f;border-radius:6px;padding:28px 28px 24px;display:flex;flex-direction:column;align-items:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.45);position:relative}
+.qrcard::before{content:'';position:absolute;inset:10px;border:1px solid rgba(138,102,36,.45);pointer-events:none}
+.qrcard .qr{width:300px;height:300px}
+.qrcard .qr svg{width:100%;height:100%;display:block}
+.qrcard b{font-size:27px;font-weight:700;margin-top:16px;color:#0f2a20}
+.qrcard span{font-family:var(--sans);font-size:15px;color:#6b5a32;margin-top:6px;letter-spacing:.01em;word-break:break-all}
+.elmain{flex:1;display:flex;flex-direction:column;min-width:0;text-align:left}
+.elstatus{display:flex;align-items:baseline;gap:26px;font-size:30px;color:var(--mist)}
+.elstatus .big{font-variant-numeric:lining-nums;font-family:var(--latin);font-size:120px;line-height:1;color:var(--gold-l);font-weight:500}
+.live{display:inline-flex;align-items:center;gap:10px;font-family:var(--sans);font-size:20px;letter-spacing:.1em;color:var(--mist)}
+.live i{width:12px;height:12px;border-radius:50%;background:#5f7d6f;display:inline-block}
+.live.on i{background:#e2546a;box-shadow:0 0 0 0 rgba(226,84,106,.6);animation:ping 1.6s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 14px rgba(226,84,106,0)}100%{box-shadow:0 0 0 0 rgba(226,84,106,0)}}
+.noms{display:flex;flex-wrap:wrap;gap:16px;align-content:flex-start;margin-top:26px;flex:1;overflow:auto;padding:4px}
+.nom{display:flex;align-items:center;gap:14px;padding:14px 26px;border:1px solid var(--line);border-radius:999px;font-size:34px;font-weight:600;color:var(--ivory);transition:all .25s;background:rgba(255,255,255,.02)}
+.nom em{font-style:normal;font-family:var(--sans);font-size:18px;color:var(--mist);font-weight:400}
+.nom .c{font-family:var(--latin);font-size:26px;color:var(--gold);border-left:1px solid var(--line2);padding-left:14px}
+.nom.on{background:linear-gradient(180deg,#f0d995,#c9a24a);color:#1b1405;border-color:#e6c97f}
+.nom.on em,.nom.on .c{color:#4b3a10}
+.cands{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:24px;margin-top:26px;align-content:start;flex:1;overflow:auto}
+.cand{border:1px solid var(--line);padding:30px 26px;text-align:center;background:linear-gradient(180deg,rgba(201,162,74,.08),rgba(201,162,74,.01));position:relative}
+.cand .no{font-variant-numeric:lining-nums;font-family:var(--latin);font-size:24px;letter-spacing:.3em;color:var(--gold)}
+.cand .nm{font-size:60px;font-weight:700;margin-top:8px}
+.cand .af{font-family:var(--sans);font-size:20px;color:var(--mist);margin-top:8px;min-height:1.4em}
+.bars{display:flex;flex-direction:column;gap:30px;margin-top:30px;flex:1;justify-content:center}
+.bar{display:grid;grid-template-columns:300px 1fr 150px;align-items:center;gap:28px}
+.bar .nm{font-size:46px;font-weight:700;text-align:right}
+.bar .nm small{display:block;font-family:var(--sans);font-size:18px;font-weight:400;color:var(--mist)}
+.bar .track{height:56px;background:rgba(255,255,255,.05);border:1px solid var(--line2);position:relative;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,#8a6624,#e6c97f);transition:width 2.4s cubic-bezier(.2,.7,.2,1)}
+.bar.top .fill{background:linear-gradient(90deg,#b0842d,#fbefc6)}
+.bar .v{font-variant-numeric:lining-nums;font-family:var(--latin);font-size:64px;color:var(--gold-l)}
+.elfoot{margin-top:34px;display:flex;gap:18px;align-items:center;justify-content:space-between}
+.netpill{font-family:var(--sans);font-size:18px;color:var(--mist);letter-spacing:.04em}
+.netpill.err{color:#f08a96}
+
+/* 당선 발표 */
+#winner .kicker{font-size:34px}
+#winner .nm{font-size:230px;font-weight:900;line-height:1.1;margin-top:30px;letter-spacing:.06em}
+#winner .af{font-family:var(--sans);font-size:32px;color:var(--mist);margin-top:14px}
+#winner .script{font-size:96px;margin-top:30px}
+
+/* ── 경품 추첨 ── */
+#draw{padding:120px 150px 130px;justify-content:flex-start}
+.dtop{display:flex;justify-content:center;align-items:center;gap:26px;margin-top:6px}
+.dtop .kicker{font-size:26px}
+.chip{font-family:var(--serif);font-size:26px;font-weight:600;color:#f6d7dc;border:1px solid rgba(178,58,76,.7);background:rgba(127,29,45,.35);padding:8px 26px;border-radius:999px;letter-spacing:.06em}
+.pname{font-size:104px;font-weight:700;line-height:1.18;margin-top:28px;word-break:keep-all;max-width:1500px}
+.pname.s{font-size:84px}
+.pqty{font-family:var(--serif);font-size:30px;color:var(--mist);margin-top:14px;letter-spacing:.08em}
+.pqty b{color:var(--gold-l);font-weight:600}
+.roller{margin-top:38px;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.roller .nm{font-size:170px;font-weight:900;line-height:1.1;letter-spacing:.08em;color:var(--ivory)}
+.roller .nm.idle{font-family:var(--latin);font-weight:400;font-size:64px;letter-spacing:.3em;color:rgba(201,162,74,.6)}
+.roller .nm.spin{color:rgba(247,240,225,.75)}
+.roller .af{font-family:var(--sans);font-size:30px;color:var(--mist);margin-top:12px;min-height:1.3em}
+.roller.compact{min-height:150px;margin-top:24px}
+.roller.compact .nm{font-size:110px}
+.wins{display:flex;flex-wrap:wrap;gap:14px 16px;justify-content:center;margin-top:28px;max-width:1560px}
+.win{border:1px solid var(--line);padding:10px 26px;font-size:30px;font-weight:600;background:rgba(201,162,74,.07);cursor:pointer;transition:all .3s}
+.win small{font-family:var(--sans);font-size:16px;font-weight:400;color:var(--mist);margin-left:10px}
+.win:hover{border-color:var(--wine-l);background:rgba(127,29,45,.3)}
+.win.new{animation:pop .8s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
+.wins.many .win{font-size:26px;padding:8px 20px}
+.dctl{position:absolute;left:0;right:0;bottom:86px;display:flex;justify-content:center;gap:18px;z-index:5}
+#burst{position:absolute;inset:0;pointer-events:none;z-index:6}
+
+/* 기증자 */
+#donor{padding:110px 160px}
+#donor .script{font-size:92px;line-height:1}
+#donor .ttl{font-size:56px;font-weight:700;margin-top:14px;letter-spacing:.04em}
+.banner{margin-top:36px;padding:16px;background:linear-gradient(135deg,#f6e6b4,#b88a2e 40%,#f3dfa0 60%,#a87a24);box-shadow:0 30px 90px rgba(0,0,0,.55)}
+.banner img{display:block;width:1000px;height:auto;image-rendering:auto}
+.gifts{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 46px;margin-top:40px;max-width:1500px}
+.gifts span{font-size:36px;font-weight:600;color:var(--ivory)}
+.gifts span i{font-variant-numeric:lining-nums;font-style:normal;font-family:var(--latin);color:var(--gold);margin-left:8px;font-size:34px}
+.gifts span::before{content:'✦';color:var(--gold);font-size:22px;margin-right:16px;vertical-align:middle}
+#donor .thx{font-size:34px;color:var(--gold-l);margin-top:36px;letter-spacing:.2em}
+
+/* 추첨 시작·끝 · 당첨자 */
+#winners{justify-content:flex-start;padding:120px 150px}
+#winners h2{font-size:70px;font-weight:700;margin-top:10px}
+.wlist{columns:3;column-gap:60px;margin-top:40px;text-align:left;width:100%;font-size:24px;overflow:auto;flex:1}
+.wlist div{break-inside:avoid;margin-bottom:22px}
+.wlist h4{font-size:26px;color:var(--gold-l);font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px;margin-bottom:6px}
+.wlist p{font-family:var(--sans);font-size:21px;line-height:1.6;color:var(--ivory)}
+.wlist p span{color:var(--mist);font-size:16px;margin-left:6px}
+
+/* ── 하단 메뉴 (마우스를 올리면 표시) ── */
+#bar{position:fixed;left:50%;bottom:18px;transform:translate(-50%,24px);z-index:50;display:flex;gap:4px;padding:8px;border-radius:999px;
+  background:rgba(8,22,17,.86);border:1px solid rgba(201,162,74,.35);backdrop-filter:blur(10px);opacity:0;transition:all .35s;font-family:var(--sans)}
+#bar.show{opacity:1;transform:translate(-50%,0)}
+#bar button{font-family:var(--sans);font-size:14px;color:#d9cfb7;padding:9px 16px;border-radius:999px;white-space:nowrap}
+#bar button:hover,#bar button.on{background:rgba(201,162,74,.2);color:#fff}
+#bar .sep{width:1px;background:rgba(201,162,74,.3);margin:6px 4px}
+
+/* ── 설정 ── */
+#setup{position:fixed;inset:0;z-index:100;background:rgba(3,10,8,.88);backdrop-filter:blur(6px);display:none;overflow:auto;font-family:var(--sans);color:#e9e4d6}
+#setup.show{display:block}
+.sp{max-width:1080px;margin:40px auto 80px;padding:0 24px}
+.sp h1{font-family:var(--serif);font-size:30px;color:var(--gold-l);font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.sp h1 button{font-size:16px;border:1px solid var(--line);border-radius:30px;padding:8px 22px;color:#e9e4d6}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(201,162,74,.25);border-radius:14px;padding:22px 24px;margin-top:20px}
+.card h3{font-family:var(--serif);font-size:20px;color:var(--gold-l);margin-bottom:10px}
+.card p.h{font-size:13.5px;color:#9fb2a6;line-height:1.7;margin-bottom:12px}
+.card input,.card select,.card textarea{font-family:var(--sans);font-size:15px;background:#0d1f19;color:#f3eee2;border:1px solid #3b4d43;border-radius:8px;padding:9px 12px}
+.card textarea{width:100%;min-height:200px;line-height:1.6}
+.sbtn{font-family:var(--sans);font-size:14px;font-weight:700;border-radius:8px;padding:10px 18px;background:linear-gradient(180deg,#f0d995,#c9a24a);color:#1b1405}
+.sbtn.g{background:#24382f;color:#e9e4d6;font-weight:500}
+.sbtn.r{background:#5b1a24;color:#ffd9de;font-weight:500}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+table.pz{width:100%;border-collapse:collapse;margin-top:6px}
+table.pz td{padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px}
+table.pz td.o{color:var(--gold);width:34px;text-align:center;font-family:var(--sans);font-size:14px}
+table.pz input.nm{width:100%}
+table.pz input.q{width:62px;text-align:center}
+table.pz button{font-size:14px;padding:6px 9px;color:#cfc6af;border-radius:6px}
+table.pz button:hover{background:rgba(255,255,255,.08)}
+table.pz tr.don td{background:rgba(127,29,45,.12)}
+.ok{color:#9fe0b8}.bad{color:#f08a96}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="snow" width="1920" height="1080"></canvas>
+  <div class="frame">
+    <svg class="corner tl" viewBox="0 0 120 120" fill="none" stroke="currentColor"><path d="M1 70V1h69" stroke-width="2"/><path d="M14 46V14h32" stroke-width="1"/><path d="M14 14l11 11" stroke-width="1"/><circle cx="29" cy="29" r="3.5" fill="currentColor"/><path d="M1 86v10M86 1h10" stroke-width="2"/></svg>
+    <svg class="corner tr" viewBox="0 0 120 120" fill="none" stroke="currentColor"><path d="M1 70V1h69" stroke-width="2"/><path d="M14 46V14h32" stroke-width="1"/><path d="M14 14l11 11" stroke-width="1"/><circle cx="29" cy="29" r="3.5" fill="currentColor"/><path d="M1 86v10M86 1h10" stroke-width="2"/></svg>
+    <svg class="corner bl" viewBox="0 0 120 120" fill="none" stroke="currentColor"><path d="M1 70V1h69" stroke-width="2"/><path d="M14 46V14h32" stroke-width="1"/><path d="M14 14l11 11" stroke-width="1"/><circle cx="29" cy="29" r="3.5" fill="currentColor"/><path d="M1 86v10M86 1h10" stroke-width="2"/></svg>
+    <svg class="corner br" viewBox="0 0 120 120" fill="none" stroke="currentColor"><path d="M1 70V1h69" stroke-width="2"/><path d="M14 46V14h32" stroke-width="1"/><path d="M14 14l11 11" stroke-width="1"/><circle cx="29" cy="29" r="3.5" fill="currentColor"/><path d="M1 86v10M86 1h10" stroke-width="2"/></svg>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute">
+    <symbol id="div" viewBox="0 0 520 34">
+      <path d="M0 17H200M320 17H520" stroke="currentColor" stroke-width="1"/>
+      <path d="M150 17h40M330 17h40" stroke="currentColor" stroke-width="3"/>
+      <path d="M260 2l4.5 10.5L275 17l-10.5 4.5L260 32l-4.5-10.5L245 17l10.5-4.5z" fill="currentColor"/>
+      <circle cx="226" cy="17" r="3" fill="currentColor"/><circle cx="294" cy="17" r="3" fill="currentColor"/>
+      <path d="M208 17l6-6 6 6-6 6zM300 17l6-6 6 6-6 6z" fill="none" stroke="currentColor"/>
+    </symbol>
+  </svg>
+
+  <!-- 표지 -->
+  <section class="scene" id="cover">
+    <svg class="bauble" viewBox="0 0 120 250" fill="none" stroke="currentColor">
+      <path d="M60 0v132" stroke-width="1.2"/>
+      <rect x="51" y="132" width="18" height="12" rx="2" fill="currentColor" stroke="none"/>
+      <circle cx="60" cy="188" r="44" stroke-width="1.5"/>
+      <circle cx="60" cy="188" r="36" stroke-width=".7" opacity=".6"/>
+      <path d="M60 163l6 16.5 17.5.5-14 10.5 5 17L60 197l-14.5 10.5 5-17-14-10.5 17.5-.5z" fill="currentColor" stroke="none" opacity=".9"/>
+    </svg>
+    <div class="kicker rise">The 41st Hanulhoe · Year-End Gala</div>
+    <h1 class="foil rise d1">2026 송년의 밤</h1>
+    <div class="script rise d2">Season of Gratitude</div>
+    <svg class="divider rise d3"><use href="#div"/></svg>
+    <div class="when rise d3">2026 · 11 · 25 &nbsp;WED&nbsp; 6:30 PM</div>
+    <div class="where rise d4">이비스 스타일 앰배서더 서울 명동 · 21F 르스타일</div>
+  </section>
+
+  <!-- 식순 -->
+  <section class="scene" id="program">
+    <div class="kicker rise">Programme</div>
+    <h2 class="foil rise d1">식 순</h2>
+    <ol id="progList" class="rise d2"></ol>
+  </section>
+
+  <!-- 순서 슬라이드들은 스크립트에서 생성 -->
+
+  <!-- 마무리 -->
+  <section class="scene" id="closing">
+    <div class="script rise">Merry Christmas<br>&amp; Happy New Year</div>
+    <svg class="divider rise d1"><use href="#div"/></svg>
+    <h2 class="rise d2">함께해 주셔서 감사합니다</h2>
+    <div class="sign rise d3">제41대 한울회</div>
+  </section>
+
+  <!-- 사업보고 -->
+  <section class="scene" id="report">
+    <img id="repImg" alt="제41대 한울회 사업보고">
+    <div class="pg" id="repPg"></div>
+  </section>
+
+  <!-- 회장 선출 -->
+  <section class="scene" id="elect">
+    <div class="kicker">2027 · The 42nd President</div>
+    <h2 class="foil" id="elTitle">차기 회장 후보 추천</h2>
+    <div class="steps">
+      <button data-st="nom">Ⅰ · 추천</button><button data-st="vote">Ⅱ · 투표</button><button data-st="result">Ⅲ · 개표</button>
+    </div>
+    <div class="elbody">
+      <div class="qrcard" id="qrCard">
+        <div class="qr" id="qrBox"></div>
+        <b id="qrLabel">휴대폰 카메라로 스캔</b>
+        <span id="qrUrl"></span>
+      </div>
+      <div class="elmain" id="elMain"></div>
+    </div>
+    <div class="elfoot" style="width:100%">
+      <span class="netpill" id="netPill"></span>
+      <div class="btnrow" id="elBtns"></div>
+    </div>
+  </section>
+
+  <!-- 당선 발표 -->
+  <section class="scene" id="winner">
+    <div class="kicker rise">제42대 한울회 회장</div>
+    <svg class="divider rise d1"><use href="#div"/></svg>
+    <div class="nm foil rise d2" id="wnName"></div>
+    <div class="af rise d3" id="wnAff"></div>
+    <div class="script rise d4">Congratulations</div>
+  </section>
+
+  <!-- 경품 추첨 -->
+  <section class="scene" id="draw">
+    <div id="drawBody" style="width:100%;display:flex;flex-direction:column;align-items:center"></div>
+    <div class="dctl" id="drawCtl"></div>
+  </section>
+
+  <!-- 기증자 -->
+  <section class="scene" id="donor">
+    <div class="script rise">With Gratitude</div>
+    <div class="ttl foil rise d1" id="dnTitle"></div>
+    <div class="banner rise d2" id="dnBanner"><img id="dnImg" alt=""></div>
+    <div class="gifts rise d3" id="dnGifts"></div>
+    <div class="thx rise d4">진심으로 감사드립니다</div>
+  </section>
+
+  <!-- 당첨자 전체 -->
+  <section class="scene" id="winners">
+    <div class="kicker">Lucky Draw · Winners</div>
+    <h2 class="foil">경품 당첨을 축하드립니다</h2>
+    <div class="wlist" id="wList"></div>
+  </section>
+
+  <canvas id="burst" width="1920" height="1080"></canvas>
+</div>
+
+<!-- 하단 메뉴 -->
+<nav id="bar">
+  <button onclick="go(-1)">◀</button>
+  <button onclick="go(1)">▶</button>
+  <span class="sep"></span>
+  <button onclick="showDeck('program')">식순</button>
+  <button onclick="openModule('report')">사업보고</button>
+  <button onclick="openModule('elect')">회장 선출</button>
+  <button onclick="openModule('draw')">경품 추첨</button>
+  <button onclick="openModule('gallery')">기증자 촬영</button>
+  <button onclick="openModule('winners')">당첨자</button>
+  <span class="sep"></span>
+  <button onclick="openSetup()">⚙ 설정</button>
+  <button onclick="toggleFs()">⛶ 전체화면</button>
+</nav>
+
+<!-- 설정 -->
+<div id="setup">
+  <div class="sp">
+    <h1>⚙ 진행 설정 <button onclick="closeSetup()">닫기 (Esc)</button></h1>
+
+    <div class="card">
+      <h3>1. 투표 서버 연결</h3>
+      <p class="h">회장 추천·투표와 참석자 명단은 Apps Script(응답 시트)와 연결됩니다. 관리자 키는 이 노트북 브라우저에만 저장됩니다.</p>
+      <div class="row">
+        <input id="keyIn" type="password" placeholder="관리자 키" style="width:220px">
+        <button class="sbtn" onclick="saveKey()">저장 · 연결 확인</button>
+        <span id="keyMsg"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2. 경품 추첨 명단 <span id="rosterCnt" style="font-family:var(--sans);font-size:14px;color:#9fb2a6"></span></h3>
+      <p class="h">「응답 시트에서 불러오기」는 '참석'으로 회신한 분을 가져옵니다. 당일 불참자는 지우고, 현장 참석자는 추가한 뒤 저장하세요. 한 줄에 <b>이름,소속</b>.</p>
+      <div class="row" style="margin-bottom:10px">
+        <button class="sbtn" onclick="loadAttendees()">응답 시트에서 불러오기</button>
+        <span id="rosterMsg"></span>
+      </div>
+      <textarea id="rosterIn" placeholder="홍길동,서울 총무처 인사팀"></textarea>
+      <div class="row"><button class="sbtn" onclick="saveRoster()">명단 저장</button></div>
+    </div>
+
+    <div class="card">
+      <h3>3. 경품 순서 (위에서부터 추첨)</h3>
+      <p class="h">순서는 ▲▼로 바꾸세요. 협찬 경품은 같은 분의 경품이 처음 나올 때 <b>기증자 감사·기념촬영 화면</b>이 먼저 나옵니다 — 같은 분 경품은 붙여 두는 것이 좋습니다. 수량만큼 당첨자를 뽑습니다.</p>
+      <table class="pz"><tbody id="pzBody"></tbody></table>
+      <div class="row">
+        <button class="sbtn g" onclick="addPrize()">＋ 경품 추가</button>
+        <button class="sbtn g" onclick="resetPrizes()">시트 기본값으로</button>
+        <button class="sbtn" onclick="savePrizes()">경품 순서 저장</button>
+        <span id="pzMsg"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>4. 기록 초기화 (리허설 후)</h3>
+      <p class="h">추첨 기록은 이 브라우저에 저장되어 새로고침해도 유지됩니다. 회장 선거 초기화는 기존 추천·투표 시트를 날짜를 붙여 보관하고 새로 시작합니다.</p>
+      <div class="row">
+        <button class="sbtn r" onclick="resetDraw()">경품 추첨 기록 초기화</button>
+        <button class="sbtn r" onclick="resetElection()">회장 추천·투표 초기화</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═════════════ 설정값 ═════════════ */
+const API = 'https://script.google.com/macros/s/AKfycbzXL3KEjGZkIJPbCzCOaVViSlhsfw-ZXD_N_VG9bIexXPWnYCHa9p14g_OgXdjm8bkQCw/exec';
+const VOTE_URL = 'https://happysnow-maker.github.io/Hanulhoe_10_YearEnd/vote.html';
+const REPORT_PAGES = 12;            // report/p01.jpg ~ p12.jpg (제41대_한울회_사업보고 PDF를 이미지로 변환)
+
+const AGENDA = [
+  { t: '개회 및 환영 인사' },
+  { t: '2026 사업 및 회계 보고', act: 'report', cta: '사업보고 자료 보기' },
+  { t: '2027 제42대 한울회<br>차기 회장 선출', plain: '2027 제42대 한울회 차기 회장 선출', act: 'elect', cta: '후보 추천 · 투표', long: true },
+  { t: '경품 추첨', act: 'draw', cta: '경품 추첨 시작' },
+  { t: '폐 회', plain: '폐회' },
+];
+
+const DONORS = {
+  chancellor: { title: '총장님', photo: 'images/donor/총장님.png' },
+  research:   { title: '연구부총장님', photo: 'images/donor/연구부총장님.png' },
+  dean:       { title: '공과대학장님', photo: 'images/donor/공과대학장님_변중무.png', note: '경품 후원금' },
+  iucf:       { title: '산학협력단장님', photo: 'images/donor/산단장님_강현종.png' },
+  president:  { title: '한울회 회장', photo: '' },
+};
+const GALLERY = ['chancellor', 'research', 'dean', 'iucf'];
+
+/* 「2026년 한울회 경품 및 기념품 후보」 시트의 경품 + 경품(경영진 협찬) — ⚙ 설정에서 순서·수량 변경 */
+const PRIZES_DEFAULT = [
+  { name: '스타벅스 상품권 1만원권', qty: 20, donor: 'president' },
+  { name: '기프트카드 3만원권', qty: 5, donor: '' },
+  { name: '산학협력단장님 협찬 선물', qty: 1, donor: 'iucf' },
+  { name: 'Body Scrub & Body Wash', qty: 2, donor: 'research' },
+  { name: 'Fiskars 가위', qty: 3, donor: 'research' },
+  { name: 'Diptyque 디퓨저', qty: 1, donor: 'research' },
+  { name: 'Tavalon 티 세트', qty: 1, donor: 'research' },
+  { name: "Daniel's Truth 디퓨저", qty: 1, donor: 'research' },
+  { name: '기프트카드 5만원권', qty: 3, donor: '' },
+  { name: '프라다 립밤', qty: 3, donor: '' },
+  { name: '올리브 & 레몬 샷 세트', qty: 1, donor: 'chancellor' },
+  { name: 'AMAN 마운틴 허니', qty: 1, donor: 'chancellor' },
+  { name: '롯데 상품권 10만원권', qty: 1, donor: 'chancellor' },
+  { name: '신세계 상품권 10만원권', qty: 1, donor: 'chancellor' },
+  { name: 'LG 프라엘 수퍼폼 갈바닉 부스터', qty: 2, donor: '' },
+  { name: 'Apple 에어팟', qty: 1, donor: '' },
+];
+
+/* ═════════════ 유틸 ═════════════ */
+const $ = (s) => document.querySelector(s);
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem('hanul26n_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('hanul26n_' + k, JSON.stringify(v)); } catch (e) {} },
+};
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = (n) => String(n).padStart(2, '0');
+const pkey = (p) => p.name + '|' + (p.aff || '');
+
+function api(params) {
+  return new Promise((resolve, reject) => {
+    const cb = '__cb' + Date.now() + Math.floor(Math.random() * 1e6);
+    const s = document.createElement('script');
+    const done = () => { clearTimeout(t); window[cb] = function () {}; s.remove(); };
+    const t = setTimeout(() => { done(); reject(new Error('timeout')); }, 20000);
+    window[cb] = (d) => { done(); resolve(d); };
+    s.onerror = () => { done(); reject(new Error('network')); };
+    s.src = API + '?' + new URLSearchParams(Object.assign({}, params, { callback: cb, _: Date.now() }));
+    document.head.appendChild(s);
+  });
+}
+function adminApi(params) {
+  const key = LS.get('key', '');
+  const ask = () => { if (!$('#setup').classList.contains('show')) openSetup(); };
+  if (!key) { ask(); return Promise.reject(new Error('⚙ 설정에서 관리자 키를 먼저 입력해 주세요.')); }
+  return api(Object.assign({ key }, params)).then((d) => {
+    if (!d.ok && d.error === 'auth') { ask(); throw new Error('관리자 키가 맞지 않습니다.'); }
+    return d;
+  });
+}
+function rnd(n) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+
+/* ═════════════ 무대 크기 맞춤 ═════════════ */
+const stage = $('#stage');
+function fit() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  stage.style.transform = `translate(-50%,-50%) scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+/* ═════════════ 눈 / 금가루 ═════════════ */
+(function snow() {
+  const c = $('#snow'), x = c.getContext('2d');
+  const P = Array.from({ length: 90 }, () => ({
+    x: Math.random() * 1920, y: Math.random() * 1080, r: Math.random() * 2.4 + .6,
+    v: Math.random() * .45 + .15, w: Math.random() * Math.PI * 2, g: Math.random() < .35,
+  }));
+  (function tick() {
+    x.clearRect(0, 0, 1920, 1080);
+    for (const p of P) {
+      p.y += p.v; p.w += .01; p.x += Math.sin(p.w) * .25;
+      if (p.y > 1090) { p.y = -10; p.x = Math.random() * 1920; }
+      x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7);
+      x.fillStyle = p.g ? `rgba(233,205,140,${.35 + p.r / 8})` : `rgba(255,255,255,${.18 + p.r / 10})`;
+      x.fill();
+    }
+    requestAnimationFrame(tick);
+  })();
+})();
+
+/* 당첨 순간의 금빛 폭죽 */
+const burst = (function () {
+  const c = $('#burst'), x = c.getContext('2d');
+  let P = [], running = false;
+  function loop() {
+    x.clearRect(0, 0, 1920, 1080);
+    P = P.filter((p) => p.life > 0);
+    for (const p of P) {
+      p.vy += .12; p.x += p.vx; p.y += p.vy; p.life -= 1; p.rot += p.vr;
+      x.save(); x.translate(p.x, p.y); x.rotate(p.rot); x.globalAlpha = Math.min(1, p.life / 40);
+      x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore();
+    }
+    if (P.length) requestAnimationFrame(loop); else { running = false; x.clearRect(0, 0, 1920, 1080); }
+  }
+  return function (cx = 960, cy = 520, n = 140) {
+    const cols = ['#f4e3ad', '#c9a24a', '#fbefc6', '#b23a4c', '#ffffff', '#e6c97f'];
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, sp = Math.random() * 11 + 3;
+      P.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 5, s: Math.random() * 12 + 6,
+        c: cols[i % cols.length], life: 90 + Math.random() * 70, rot: Math.random() * 6, vr: (Math.random() - .5) * .3 });
+    }
+    if (!running) { running = true; loop(); }
+  };
+})();
+
+/* ═════════════ 식순 덱 ═════════════ */
+(function buildAgenda() {
+  const ol = $('#progList');
+  AGENDA.forEach((a, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="n">${pad(i + 1)}</span><span class="t">${esc(a.plain || a.t)}</span>` + (a.act ? '<span class="go">Open ›</span>' : '');
+    li.onclick = () => showDeck('a' + i);
+    ol.appendChild(li);
+
+    const s = document.createElement('section');
+    s.className = 'scene item'; s.id = 'a' + i;
+    s.innerHTML = `<div class="num rise">${pad(i + 1)}</div>
+      <svg class="divider rise d1"><use href="#div"/></svg>
+      <h2 class="foil rise d2${a.long ? ' long' : ''}">${a.t}</h2>` +
+      (a.act ? `<button class="cta rise d3" onclick="openModule('${a.act}')">${esc(a.cta)} <small>ENTER ›</small></button>` : '');
+    $('#closing').before(s);
+  });
+})();
+const DECK = ['cover', 'program'].concat(AGENDA.map((_, i) => 'a' + i), ['closing']);
+let deckIdx = 0, mode = 'deck';   // mode: deck | report | elect | winner | draw | gallery | winners
+
+function showScene(id) {
+  document.querySelectorAll('.scene.on').forEach((s) => s.classList.remove('on'));
+  const el = document.getElementById(id);
+  void el.offsetWidth;
+  el.classList.add('on');
+}
+function showDeck(id) {
+  stopElectPoll();
+  mode = 'deck';
+  deckIdx = Math.max(0, DECK.indexOf(id));
+  const ai = id[0] === 'a' ? +id.slice(1) : (id === 'closing' ? AGENDA.length : -1);
+  if (ai >= 0) LS.set('agendaAt', ai);
+  markProgram();
+  showScene(DECK[deckIdx]);
+}
+function markProgram() {
+  const at = LS.get('agendaAt', -1);
+  document.querySelectorAll('#progList li').forEach((li, i) => {
+    li.classList.toggle('done', i < at);
+    li.classList.toggle('cur', i === at);
+  });
+}
+function backToAgenda(act) {
+  const i = AGENDA.findIndex((a) => a.act === act);
+  showDeck(i >= 0 ? 'a' + i : 'program');
+}
+
+function openModule(m) {
+  stopElectPoll();
+  mode = m;
+  if (m === 'report') { renderReport(); showScene('report'); }
+  else if (m === 'elect') { showScene('elect'); startElect(); }
+  else if (m === 'draw') { openDraw(); }
+  else if (m === 'gallery') { galIdx = 0; renderGallery(); }
+  else if (m === 'winners') { renderWinners(); showScene('winners'); }
+}
+
+/* 공통 이동 (→ / ←) */
+function go(dir) {
+  if (mode === 'deck') {
+    const n = deckIdx + dir;
+    if (n >= 0 && n < DECK.length) showDeck(DECK[n]);
+  } else if (mode === 'report') {
+    const n = repIdx + dir;
+    if (n >= 0 && n < REPORT_PAGES) { repIdx = n; renderReport(); }
+    else if (n >= REPORT_PAGES) backToAgenda('report');
+  } else if (mode === 'draw') drawStepMove(dir);
+  else if (mode === 'gallery') { const n = galIdx + dir; if (n >= 0 && n < GALLERY.length) { galIdx = n; renderGallery(); } }
+  else if (mode === 'winner') { mode = 'elect'; showScene('elect'); startElect(); }
+}
+function escBack() {
+  if (mode === 'deck') { if (DECK[deckIdx] !== 'program') showDeck('program'); return; }
+  if (mode === 'winner') { mode = 'elect'; showScene('elect'); startElect(); return; }
+  if (mode === 'gallery' || mode === 'winners') { openDraw(); return; }
+  backToAgenda(mode);
+}
+
+/* ═════════════ 사업보고 ═════════════ */
+let repIdx = 0;
+function renderReport() {
+  const img = $('#repImg');
+  img.src = 'report/p' + pad(repIdx + 1) + '.jpg';
+  $('#repPg').textContent = (repIdx + 1) + ' / ' + REPORT_PAGES;
+  // 다음 장 미리 불러오기
+  if (repIdx + 1 < REPORT_PAGES) (new Image()).src = 'report/p' + pad(repIdx + 2) + '.jpg';
+}
+
+/* ═════════════ 회장 선출 ═════════════ */
+const EL = { phase: 'idle', cands: [], noms: [], total: 0, view: null, online: false, manual: LS.get('manualVotes', null) };
+let pick = LS.get('pick', []);    // 투표 후보로 확정할 목록 [{name, aff}]
+let elTimer = null;
+
+function stopElectPoll() { clearInterval(elTimer); elTimer = null; }
+function startElect() {
+  drawQR();
+  refreshElect();
+  stopElectPoll();
+  elTimer = setInterval(refreshElect, 3000);
+}
+function drawQR() {
+  if (typeof qrcode === 'undefined') { $('#qrBox').innerHTML = '<p style="padding:40px;font-size:20px">QR 라이브러리를 불러오지 못했습니다</p>'; return; }
+  const q = qrcode(0, 'M'); q.addData(VOTE_URL); q.make();
+  $('#qrBox').innerHTML = q.createSvgTag({ cellSize: 8, margin: 2, scalable: true });
+  $('#qrUrl').textContent = VOTE_URL.replace(/^https:\/\//, '');
+}
+function refreshElect() {
+  adminApi({ action: 'admin' }).then((d) => {
+    if (!d.ok) throw new Error(d.error);
+    EL.online = true;
+    EL.phase = d.phase; EL.cands = d.cands; EL.noms = d.noms; EL.total = d.totalVotes;
+    $('#netPill').textContent = '● 서버 연결됨'; $('#netPill').className = 'netpill';
+    renderElect();
+  }).catch((e) => {
+    EL.online = false;
+    $('#netPill').textContent = '⚠ ' + e.message + ' — 수동 진행 가능'; $('#netPill').className = 'netpill err';
+    renderElect();
+  });
+}
+function elStep() {
+  if (EL.view) return EL.view;
+  return EL.phase === 'vote' ? 'vote' : EL.phase === 'closed' ? 'result' : 'nom';
+}
+function setView(v) { EL.view = v; renderElect(); }
+document.querySelectorAll('#elect .steps button').forEach((b) => b.onclick = () => setView(b.dataset.st));
+
+function inPick(name) { return pick.some((p) => p.name.replace(/\s/g, '') === name.replace(/\s/g, '')); }
+function togglePick(i) {
+  const n = EL.noms[i];
+  if (inPick(n.name)) pick = pick.filter((p) => p.name.replace(/\s/g, '') !== n.name.replace(/\s/g, ''));
+  else pick.push({ name: n.name, aff: n.aff });
+  LS.set('pick', pick); renderElect();
+}
+function addManualCand() {
+  const name = prompt('후보로 올릴 분의 성명'); if (!name || !name.trim()) return;
+  const aff = prompt('소속 (생략 가능)') || '';
+  pick.push({ name: name.trim(), aff: aff.trim() }); LS.set('pick', pick); renderElect();
+}
+function removePick(i) { pick.splice(i, 1); LS.set('pick', pick); renderElect(); }
+
+function setPhase(phase, withCands) {
+  const params = { action: 'setphase', phase };
+  if (withCands) params.cands = JSON.stringify(pick);
+  return adminApi(params).then((d) => {
+    if (!d.ok) throw new Error(d.error);
+    EL.phase = d.phase; EL.cands = d.cands; EL.noms = d.noms; EL.total = d.totalVotes; EL.view = null;
+    renderElect();
+  }).catch((e) => alert('서버에 반영하지 못했습니다: ' + e.message));
+}
+function startVote() {
+  if (!pick.length) { alert('추천 목록에서 후보를 눌러 선택하거나 「직접 추가」로 후보를 정해 주세요.'); return; }
+  if (!confirm('후보 ' + pick.length + '명(' + pick.map((p) => p.name).join(', ') + ')으로 투표를 시작할까요?\n참석자 휴대폰 화면이 투표지로 바뀝니다.')) return;
+  EL.manual = null; LS.set('manualVotes', null);
+  setPhase('vote', true);
+}
+function acclaim() {
+  const c = pick[0] || EL.cands[0];
+  if (!c) return;
+  if (!confirm(c.name + '님을 단독 후보로 박수 추대하여 바로 발표할까요?')) return;
+  showWinner(c);
+}
+function manualCount() {
+  const list = EL.cands.length ? EL.cands : pick.map((p, i) => ({ no: i + 1, name: p.name, aff: p.aff }));
+  if (!list.length) { alert('후보가 없습니다.'); return; }
+  const m = {};
+  for (const c of list) {
+    const v = prompt(`[${c.no}번] ${c.name} — 득표 수 (종이 개표 결과)`, EL.manual && EL.manual[c.no] != null ? EL.manual[c.no] : '');
+    if (v === null) return;
+    m[c.no] = parseInt(v, 10) || 0;
+  }
+  EL.manual = m; LS.set('manualVotes', m); EL.view = 'result'; renderElect();
+}
+function resultList() {
+  const base = EL.cands.length ? EL.cands : pick.map((p, i) => ({ no: i + 1, name: p.name, aff: p.aff, votes: 0 }));
+  return base.map((c) => Object.assign({}, c, { votes: EL.manual ? (EL.manual[c.no] || 0) : (c.votes || 0) }));
+}
+function runoff(tied) {
+  if (!confirm('동수 후보(' + tied.map((c) => c.name).join(', ') + ')로 결선 투표를 할까요?\n지금까지의 투표 기록은 시트에 보관됩니다.')) return;
+  pick = tied.map((c) => ({ name: c.name, aff: c.aff })); LS.set('pick', pick);
+  adminApi({ action: 'reset' }).then(() => setPhase('vote', true)).catch((e) => alert(e.message));
+}
+function showWinner(c) {
+  stopElectPoll();
+  mode = 'winner';
+  $('#wnName').textContent = c.name;
+  $('#wnAff').textContent = c.aff || '';
+  showScene('winner');
+  setTimeout(() => burst(960, 420, 220), 700);
+  setTimeout(() => burst(560, 520, 120), 1300);
+  setTimeout(() => burst(1360, 520, 120), 1600);
+}
+
+let lastBarsKey = '';
+function renderElect() {
+  const st = elStep();
+  document.querySelectorAll('#elect .steps button').forEach((b) => b.classList.toggle('on', b.dataset.st === st));
+  const main = $('#elMain'), btns = $('#elBtns');
+  $('#qrCard').style.display = st === 'result' ? 'none' : '';
+  const live = (on, txt) => `<span class="live${on ? ' on' : ''}"><i></i>${txt}</span>`;
+
+  if (st === 'nom') {
+    $('#elTitle').textContent = '차기 회장 후보 추천';
+    $('#qrLabel').textContent = 'QR로 후보를 추천해 주세요';
+    const open = EL.phase === 'nominate';
+    main.innerHTML =
+      `<div class="elstatus"><span class="big">${EL.noms.reduce((s, n) => s + n.count, 0)}</span><span>건의 추천 &nbsp; ${live(open, open ? '추천 받는 중' : '추천 대기')}</span></div>` +
+      `<div class="noms">${EL.noms.map((n, i) => `<button class="nom${inPick(n.name) ? ' on' : ''}" onclick="togglePick(${i})">${esc(n.name)}${n.aff ? `<em>${esc(n.aff)}</em>` : ''}<span class="c">${n.count}</span></button>`).join('') ||
+        '<p class="muted" style="font-size:28px;margin-top:20px;width:100%">추천이 들어오면 이곳에 이름이 나타납니다.</p>'}
+        ${pick.filter((p) => !EL.noms.some((n) => n.name.replace(/\s/g, '') === p.name.replace(/\s/g, ''))).map((p) => `<button class="nom on" onclick="removePick(${pick.indexOf(p)})">${esc(p.name)}${p.aff ? `<em>${esc(p.aff)}</em>` : ''}<span class="c">현장</span></button>`).join('')}
+      </div>
+      <p class="muted" style="font-family:var(--sans);font-size:19px;margin-top:10px">이름을 누르면 투표 후보로 확정됩니다 (금색) · 선택 ${pick.length}명</p>`;
+    btns.innerHTML =
+      `<button class="btn ghost" onclick="addManualCand()">＋ 현장 후보 직접 추가</button>` +
+      (pick.length === 1 ? `<button class="btn ghost" onclick="acclaim()">단독 후보 · 박수 추대</button>` : '') +
+      (open ? `<button class="btn solid" onclick="startVote()">추천 마감 · 투표 시작 ›</button>`
+            : `<button class="btn solid" onclick="setPhase('nominate')">추천 받기 시작 ›</button>` +
+              (pick.length ? `<button class="btn" onclick="startVote()">투표 시작 ›</button>` : ''));
+  }
+  else if (st === 'vote') {
+    $('#elTitle').textContent = '차기 회장 투표';
+    $('#qrLabel').textContent = 'QR로 한 표를 행사해 주세요';
+    const open = EL.phase === 'vote';
+    const list = EL.cands.length ? EL.cands : pick.map((p, i) => ({ no: i + 1, name: p.name, aff: p.aff }));
+    main.innerHTML =
+      `<div class="elstatus"><span class="big">${EL.total}</span><span>표 참여 &nbsp; ${live(open, open ? '투표 진행 중' : '투표 대기')}</span></div>` +
+      `<div class="cands">${list.map((c) => `<div class="cand"><div class="no">No. ${c.no}</div><div class="nm">${esc(c.name)}</div><div class="af">${esc(c.aff || '')}</div></div>`).join('')}</div>`;
+    btns.innerHTML = open
+      ? `<button class="btn solid" onclick="if(confirm('투표를 마감하고 개표할까요?')) setPhase('closed')">투표 마감 · 개표 ›</button>`
+      : `<button class="btn ghost" onclick="setView('nom')">‹ 추천 단계</button><button class="btn solid" onclick="startVote()">투표 시작 ›</button>`;
+  }
+  else {
+    $('#elTitle').textContent = '개표 결과';
+    const list = resultList();
+    const total = list.reduce((s, c) => s + c.votes, 0);
+    const max = Math.max(0, ...list.map((c) => c.votes));
+    const top = list.filter((c) => c.votes === max && max > 0);
+    const key = JSON.stringify(list.map((c) => [c.no, c.votes]));
+    if (key !== lastBarsKey || !main.querySelector('.bars')) {
+      lastBarsKey = key;
+      main.innerHTML = `<div class="elstatus" style="justify-content:center"><span>총 <b style="color:var(--gold-l);font-family:var(--latin);font-size:64px">${total}</b> 표${EL.manual ? ' · 수기 개표' : ''}</span></div>` +
+        `<div class="bars">${list.map((c) => `<div class="bar${top.length === 1 && c.votes === max ? ' top' : ''}"><div class="nm">${esc(c.name)}<small>${esc(c.aff || '')}</small></div><div class="track"><div class="fill" data-w="${total ? c.votes / max * 100 : 0}"></div></div><div class="v">${c.votes}</div></div>`).join('')}</div>`;
+      requestAnimationFrame(() => requestAnimationFrame(() => main.querySelectorAll('.fill').forEach((f) => f.style.width = f.dataset.w + '%')));
+    }
+    EL.top = top;
+    btns.innerHTML = `<button class="btn ghost" onclick="manualCount()">수기 개표 입력</button>` +
+      (top.length > 1 ? `<button class="btn" onclick="runoff(EL.top)">동수 · 결선 투표</button>` : '') +
+      (top.length === 1 ? `<button class="btn solid" onclick="showWinner(EL.top[0])">당선자 발표 ✦</button>` : '');
+  }
+}
+
+/* ═════════════ 경품 추첨 ═════════════ */
+let prizes = LS.get('prizes', null) || PRIZES_DEFAULT.map((p) => Object.assign({}, p));
+let roster = LS.get('roster', []);
+let wins = LS.get('wins', []);           // [{pi, name, aff}]  pi = prizes 배열 위치
+let absent = LS.get('absent', []);       // 불참 처리된 사람 key
+let steps = [], stepIdx = LS.get('drawStep', 0), spinning = false;
+
+function buildSteps() {
+  steps = [{ t: 'intro' }];
+  let prev = null;
+  prizes.forEach((p, i) => {
+    if (p.donor && DONORS[p.donor] && DONORS[p.donor].photo && p.donor !== prev) steps.push({ t: 'donor', d: p.donor });
+    steps.push({ t: 'prize', i });
+    prev = p.donor || null;
+  });
+  steps.push({ t: 'end' });
+  if (stepIdx >= steps.length) stepIdx = steps.length - 1;
+}
+function winsOf(i) { return wins.filter((w) => w.pi === i); }
+function pool() {
+  const out = new Set(wins.map(pkey).concat(absent));
+  return roster.filter((r) => !out.has(pkey(r)));
+}
+function totalQty() { return prizes.reduce((s, p) => s + (+p.qty || 0), 0); }
+
+function openDraw() {
+  mode = 'draw';
+  buildSteps();
+  renderDrawStep();
+  if (!roster.length) {
+    adminApi({ action: 'attendees' }).then((d) => {
+      if (d.ok && d.list.length) { roster = d.list; LS.set('roster', roster); renderDrawStep(); }
+    }).catch(() => {});
+  }
+}
+function drawStepMove(dir) {
+  if (spinning) return;
+  const n = stepIdx + dir;
+  if (n < 0 || n >= steps.length) { if (n < 0) backToAgenda('draw'); return; }
+  stepIdx = n; LS.set('drawStep', stepIdx);
+  renderDrawStep();
+}
+function renderDrawStep() {
+  const s = steps[stepIdx];
+  if (s.t === 'donor') { renderDonor(s.d, true); return; }
+  showScene('draw');
+  const body = $('#drawBody'), ctl = $('#drawCtl');
+  const prizeCount = prizes.length;
+  if (s.t === 'intro') {
+    body.innerHTML = `<div class="kicker rise" style="margin-top:130px">Lucky Draw</div>
+      <div class="pname foil rise d1" style="font-size:150px">경품 추첨</div>
+      <svg class="divider rise d2"><use href="#div"/></svg>
+      <div class="pqty rise d3" style="font-size:36px">${prizeCount}종 · <b>${totalQty()}</b>개의 선물 &nbsp;·&nbsp; 추첨 대상 <b>${pool().length}</b>명</div>
+      <div class="script rise d4" style="font-size:80px;margin-top:40px">Good luck to all</div>`;
+    ctl.innerHTML = roster.length ? `<button class="btn solid" onclick="drawStepMove(1)">첫 번째 경품 ›</button>`
+      : `<button class="btn solid" onclick="openSetup()">⚙ 추첨 명단을 먼저 불러와 주세요</button>`;
+    return;
+  }
+  if (s.t === 'end') {
+    body.innerHTML = `<div class="kicker rise" style="margin-top:150px">Thank you</div>
+      <div class="pname foil rise d1" style="font-size:130px">모든 추첨이 끝났습니다</div>
+      <svg class="divider rise d2"><use href="#div"/></svg>
+      <div class="pqty rise d3" style="font-size:34px">당첨자 <b>${wins.length}</b>명 · 기증해 주신 분들과 기념 촬영이 이어집니다</div>`;
+    ctl.innerHTML = `<button class="btn" onclick="openModule('winners')">당첨자 전체 보기</button><button class="btn solid" onclick="openModule('gallery')">기증자 기념 촬영 ›</button>`;
+    return;
+  }
+  const i = s.i, p = prizes[i], ws = winsOf(i), left = Math.max(0, p.qty - ws.length);
+  const ordinal = steps.filter((x, k) => x.t === 'prize' && k <= stepIdx).length;
+  const many = p.qty > 6;
+  const d = p.donor && DONORS[p.donor];
+  body.innerHTML =
+    `<div class="dtop"><span class="kicker">Lucky Draw · ${pad(ordinal)} / ${pad(prizeCount)}</span>${d ? `<span class="chip">${esc(d.title)} 협찬</span>` : ''}</div>
+     <div class="pname foil${p.name.length > 14 || many ? ' s' : ''}">${esc(p.name)}</div>
+     <div class="pqty">${p.qty}명 추첨 · 남은 <b>${left}</b>명 &nbsp;·&nbsp; 추첨 대상 ${pool().length}명</div>
+     <div class="roller${many ? ' compact' : ''}"><div class="nm idle" id="rlName">${left ? 'Ready' : 'Complete'}</div><div class="af" id="rlAff"></div></div>
+     <div class="wins${many ? ' many' : ''}" id="winBox">${ws.map((w) => winChip(w)).join('')}</div>`;
+  renderDrawCtl();
+}
+function winChip(w, isNew) {
+  const idx = wins.indexOf(w);
+  return `<button class="win${isNew ? ' new' : ''}" title="클릭: 불참 처리 후 재추첨" onclick="markAbsent(${idx})">${esc(w.name)}<small>${esc(w.aff || '')}</small></button>`;
+}
+function renderDrawCtl() {
+  const s = steps[stepIdx]; if (!s || s.t !== 'prize') return;
+  const p = prizes[s.i], left = Math.max(0, p.qty - winsOf(s.i).length);
+  $('#drawCtl').innerHTML =
+    `<button class="btn ghost" onclick="drawStepMove(-1)">‹ 이전</button>` +
+    (left ? `<button class="btn solid" onclick="drawOne()">✦ 추첨 <small style="font-family:var(--latin);font-size:18px;letter-spacing:.2em;opacity:.7">SPACE</small></button>` : '') +
+    (left > 1 ? `<button class="btn" onclick="drawAll()">남은 ${left}명 한 번에</button>` : '') +
+    `<button class="btn${left ? ' ghost' : ' solid'}" onclick="drawStepMove(1)">다음 ›</button>`;
+}
+function animateName(final, ms) {
+  return new Promise((resolve) => {
+    const el = $('#rlName'), af = $('#rlAff'), pl = pool();
+    el.className = 'nm spin'; af.textContent = '';
+    const start = performance.now();
+    (function step() {
+      const t = (performance.now() - start) / ms;
+      if (t >= 1) {
+        el.className = 'nm foil'; el.textContent = final.name; af.textContent = final.aff || '';
+        return resolve();
+      }
+      el.textContent = pl[rnd(pl.length)].name;
+      setTimeout(step, 40 + 260 * t * t);
+    })();
+  });
+}
+async function drawOne(fast) {
+  if (spinning) return;
+  const s = steps[stepIdx]; if (!s || s.t !== 'prize') return;
+  const p = prizes[s.i];
+  if (winsOf(s.i).length >= p.qty) return;
+  const pl = pool();
+  if (!pl.length) { alert('추첨할 사람이 남아 있지 않습니다. ⚙ 설정에서 명단을 확인하세요.'); return; }
+  spinning = true; $('#drawCtl').style.opacity = .3;
+  const w = pl[rnd(pl.length)];
+  await animateName(w, fast ? 650 : 2600);
+  const rec = { pi: s.i, name: w.name, aff: w.aff || '' };
+  wins.push(rec); LS.set('wins', wins);
+  $('#winBox').insertAdjacentHTML('beforeend', winChip(rec, true));
+  burst(960, 560, fast ? 60 : 150);
+  spinning = false; $('#drawCtl').style.opacity = '';
+  const left = p.qty - winsOf(s.i).length;
+  document.querySelector('#draw .pqty b').textContent = left;
+  renderDrawCtl();
+}
+async function drawAll() {
+  const s = steps[stepIdx]; if (!s || s.t !== 'prize') return;
+  while (!spinning && winsOf(s.i).length < prizes[s.i].qty && pool().length) {
+    await drawOne(true);
+    await new Promise((r) => setTimeout(r, 220));
+    if (steps[stepIdx] !== s || mode !== 'draw') break;
+  }
+}
+function advance() {           // 리모컨 '다음' / Space: 남은 사람이 있으면 추첨, 없으면 다음 화면
+  const s = steps[stepIdx];
+  if (s && s.t === 'prize' && winsOf(s.i).length < prizes[s.i].qty && roster.length) drawOne();
+  else drawStepMove(1);
+}
+function markAbsent(idx) {
+  if (spinning) return;
+  const w = wins[idx]; if (!w) return;
+  if (!confirm(w.name + '님을 불참 처리하고 이 경품을 다시 추첨할까요?\n(이후 추첨 대상에서도 제외됩니다)')) return;
+  absent.push(pkey(w)); LS.set('absent', absent);
+  wins.splice(idx, 1); LS.set('wins', wins);
+  renderDrawStep();
+}
+
+/* 기증자 감사 · 기념 촬영 */
+let galIdx = 0;
+function renderDonor(key, inDraw) {
+  const d = DONORS[key];
+  $('#dnTitle').textContent = d.title + '께서 보내주신 선물';
+  $('#dnImg').src = d.photo;
+  $('#dnBanner').style.display = d.photo ? '' : 'none';
+  const items = prizes.filter((p) => p.donor === key);
+  $('#dnGifts').innerHTML = items.map((p) => `<span>${esc(p.name)}${p.qty > 1 ? `<i>× ${p.qty}</i>` : ''}</span>`).join('') +
+    (d.note ? `<span>${esc(d.note)}</span>` : '');
+  showScene('donor');
+}
+function renderGallery() { mode = 'gallery'; renderDonor(GALLERY[galIdx]); }
+
+function renderWinners() {
+  const groups = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.ws.length);
+  $('#wList').innerHTML = groups.map((g) => `<div><h4>${esc(g.p.name)}</h4><p>${g.ws.length > 6 ? g.ws.map((w) => esc(w.name)).join(' · ') : g.ws.map((w) => `${esc(w.name)}<span>${esc(w.aff || '')}</span>`).join('<br>')}</p></div>`).join('') ||
+    '<p class="muted" style="font-size:28px;text-align:center">아직 당첨자가 없습니다.</p>';
+  const n = wins.length;
+  $('#wList').style.fontSize = n > 40 ? '20px' : '';
+  $('#wList').style.columns = n > 30 ? 4 : 3;
+}
+
+/* ═════════════ 설정 ═════════════ */
+function openSetup() {
+  $('#setup').classList.add('show');
+  $('#keyIn').value = LS.get('key', '');
+  $('#rosterIn').value = roster.map((r) => r.name + (r.aff ? ',' + r.aff : '')).join('\n');
+  $('#rosterCnt').textContent = '· 현재 ' + roster.length + '명';
+  renderPrizeTable();
+}
+function closeSetup() { $('#setup').classList.remove('show'); if (mode === 'draw') { buildSteps(); renderDrawStep(); } }
+function saveKey() {
+  LS.set('key', $('#keyIn').value.trim());
+  $('#keyMsg').textContent = '확인 중…'; $('#keyMsg').className = '';
+  adminApi({ action: 'admin' }).then((d) => {
+    $('#keyMsg').textContent = d.ok ? '✔ 연결되었습니다 (현재 단계: ' + d.phase + ')' : '✕ ' + d.error;
+    $('#keyMsg').className = d.ok ? 'ok' : 'bad';
+  }).catch((e) => { $('#keyMsg').textContent = '✕ ' + e.message; $('#keyMsg').className = 'bad'; });
+}
+function loadAttendees() {
+  $('#rosterMsg').textContent = '불러오는 중…';
+  adminApi({ action: 'attendees' }).then((d) => {
+    if (!d.ok) throw new Error(d.error);
+    $('#rosterIn').value = d.list.map((r) => r.name + (r.aff ? ',' + r.aff : '')).join('\n');
+    $('#rosterMsg').textContent = '✔ 참석 회신 ' + d.list.length + '명을 불러왔습니다 — 확인 후 「명단 저장」';
+    $('#rosterMsg').className = 'ok';
+  }).catch((e) => { $('#rosterMsg').textContent = '✕ ' + e.message; $('#rosterMsg').className = 'bad'; });
+}
+function saveRoster() {
+  roster = $('#rosterIn').value.split('\n').map((l) => {
+    const i = l.indexOf(',');
+    return i < 0 ? { name: l.trim(), aff: '' } : { name: l.slice(0, i).trim(), aff: l.slice(i + 1).trim() };
+  }).filter((r) => r.name);
+  LS.set('roster', roster);
+  $('#rosterCnt').textContent = '· 현재 ' + roster.length + '명';
+  $('#rosterMsg').textContent = '✔ ' + roster.length + '명 저장'; $('#rosterMsg').className = 'ok';
+}
+function donorOptions(sel) {
+  return '<option value="">한울회 준비</option>' + Object.keys(DONORS).map((k) => `<option value="${k}"${k === sel ? ' selected' : ''}>${DONORS[k].title} 협찬</option>`).join('');
+}
+let draft = [];
+function renderPrizeTable(keep) {
+  if (!keep) draft = prizes.map((p) => Object.assign({}, p));
+  $('#pzBody').innerHTML = draft.map((p, i) => `<tr class="${p.donor && DONORS[p.donor] && DONORS[p.donor].photo ? 'don' : ''}">
+    <td class="o">${i + 1}</td>
+    <td><input class="nm" value="${esc(p.name)}" oninput="draft[${i}].name=this.value"></td>
+    <td><input class="q" type="number" min="1" value="${p.qty}" oninput="draft[${i}].qty=Math.max(1,parseInt(this.value,10)||1)">개</td>
+    <td><select onchange="draft[${i}].donor=this.value;renderPrizeTable(true)">${donorOptions(p.donor)}</select></td>
+    <td style="white-space:nowrap"><button onclick="mvPrize(${i},-1)">▲</button><button onclick="mvPrize(${i},1)">▼</button><button onclick="rmPrize(${i})">✕</button></td></tr>`).join('');
+  const t = draft.reduce((s, p) => s + (+p.qty || 0), 0);
+  $('#pzMsg').textContent = draft.length + '종 · 총 ' + t + '개'; $('#pzMsg').className = '';
+}
+function mvPrize(i, d) { const j = i + d; if (j < 0 || j >= draft.length) return; [draft[i], draft[j]] = [draft[j], draft[i]]; renderPrizeTable(true); }
+function rmPrize(i) { draft.splice(i, 1); renderPrizeTable(true); }
+function addPrize() { draft.push({ name: '새 경품', qty: 1, donor: '' }); renderPrizeTable(true); }
+function resetPrizes() { draft = PRIZES_DEFAULT.map((p) => Object.assign({}, p)); renderPrizeTable(true); }
+function savePrizes() {
+  if (wins.length && !confirm('이미 추첨 기록이 있습니다. 경품 순서를 바꾸면 기존 당첨 기록과 경품이 어긋날 수 있습니다.\n(리허설 기록이면 「경품 추첨 기록 초기화」를 먼저 누르세요) 그래도 저장할까요?')) return;
+  prizes = draft.filter((p) => p.name.trim()).map((p) => ({ name: p.name.trim(), qty: +p.qty || 1, donor: p.donor }));
+  LS.set('prizes', prizes);
+  buildSteps(); renderPrizeTable();
+  $('#pzMsg').textContent = '✔ 저장했습니다 · ' + prizes.length + '종 ' + totalQty() + '개'; $('#pzMsg').className = 'ok';
+}
+function resetDraw() {
+  if (!confirm('경품 당첨·불참 기록을 모두 지울까요? (명단·경품 순서는 유지)')) return;
+  wins = []; absent = []; stepIdx = 0;
+  LS.set('wins', wins); LS.set('absent', absent); LS.set('drawStep', 0);
+  alert('초기화했습니다.');
+}
+function resetElection() {
+  if (!confirm('회장 추천·투표를 처음 상태로 돌릴까요?\n(시트의 기존 기록은 날짜를 붙여 보관됩니다)')) return;
+  adminApi({ action: 'reset' }).then(() => {
+    pick = []; LS.set('pick', pick); EL.manual = null; LS.set('manualVotes', null); EL.view = null;
+    alert('초기화했습니다.');
+  }).catch((e) => alert(e.message));
+}
+
+/* ═════════════ 전체화면 · 메뉴 · 키보드 ═════════════ */
+function toggleFs() {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen().catch(() => {});
+}
+let barT;
+addEventListener('mousemove', (e) => {
+  const bar = $('#bar');
+  if (e.clientY > innerHeight - 140) { bar.classList.add('show'); clearTimeout(barT); barT = setTimeout(() => bar.classList.remove('show'), 2500); }
+});
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea,select')) { if (e.key === 'Escape') closeSetup(); return; }
+  if ($('#setup').classList.contains('show')) { if (e.key === 'Escape') closeSetup(); return; }
+  const k = e.key;
+  if (k === 'f' || k === 'F') { toggleFs(); return; }
+  if (k === 'Escape') { escBack(); return; }
+  if (mode === 'draw') {
+    if (k === ' ' || k === 'PageDown' || k === 'Enter') { e.preventDefault(); advance(); return; }
+    if (k === 'PageUp' || k === 'ArrowLeft') { e.preventDefault(); drawStepMove(-1); return; }
+    if (k === 'ArrowRight') { e.preventDefault(); drawStepMove(1); return; }
+    return;
+  }
+  if (k === 'Enter' && mode === 'deck') {
+    const id = DECK[deckIdx];
+    if (id[0] === 'a' && AGENDA[+id.slice(1)].act) openModule(AGENDA[+id.slice(1)].act);
+    return;
+  }
+  if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(1); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(-1); }
+});
+stage.addEventListener('dblclick', toggleFs);
+
+/* 시작 */
+markProgram();
+showScene('cover');
+</script>
+</body>
+</html>
