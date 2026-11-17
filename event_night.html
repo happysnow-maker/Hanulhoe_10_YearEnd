@@ -199,6 +199,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .gifts span i{font-variant-numeric:lining-nums;font-style:normal;font-family:var(--latin);color:var(--gold);margin-left:8px;font-size:34px}
 .gifts span::before{content:'✦';color:var(--gold);font-size:22px;margin-right:16px;vertical-align:middle}
 #donor .thx{font-size:34px;color:var(--gold-l);margin-top:36px;letter-spacing:.2em}
+#donor .pg{position:absolute;right:90px;bottom:80px;font-family:var(--latin);font-size:24px;letter-spacing:.2em;color:rgba(201,162,74,.6)}
 
 /* 추첨 시작·끝 · 당첨자 */
 #winners{justify-content:flex-start;padding:120px 150px}
@@ -347,6 +348,7 @@ table.pz tr.don td{background:rgba(127,29,45,.12)}
     <div class="banner rise d2" id="dnBanner"><img id="dnImg" alt=""></div>
     <div class="gifts rise d3" id="dnGifts"></div>
     <div class="thx rise d4">진심으로 감사드립니다</div>
+    <div class="pg" id="dnPg"></div>
   </section>
 
   <!-- 당첨자 전체 -->
@@ -608,7 +610,7 @@ function openModule(m) {
   if (m === 'report') { renderReport(); showScene('report'); }
   else if (m === 'elect') { showScene('elect'); startElect(); }
   else if (m === 'draw') { openDraw(); }
-  else if (m === 'gallery') { galIdx = 0; renderGallery(); }
+  else if (m === 'gallery') { galIdx = Math.max(0, GALLERY.indexOf(currentDrawDonor())); renderGallery(); }
   else if (m === 'winners') { renderWinners(); showScene('winners'); }
 }
 
@@ -962,9 +964,19 @@ function renderDonor(key, inDraw) {
   $('#dnTitle').textContent = d.title + (items.length && items.every((p) => !(+p.qty > 0)) ? '께서 보내주신 마음' : '께서 보내주신 선물');
   $('#dnGifts').innerHTML = items.map((p) => `<span>${esc(p.name)}${p.qty > 1 ? `<i>× ${p.qty}</i>` : ''}</span>`).join('') +
     (d.note && !items.length ? `<span>${esc(d.note)}</span>` : '');
+  $('#dnPg').textContent = mode === 'gallery' ? (galIdx + 1) + ' / ' + GALLERY.length + '   ‹ ›' : '';
   showScene('donor');
 }
 function renderGallery() { mode = 'gallery'; renderDonor(GALLERY[galIdx]); }
+/* 경품 추첨 중 「기증자 촬영」을 누르면: 지금 화면(또는 바로 앞)의 협찬 기증자부터 보여 줌 */
+function currentDrawDonor() {
+  if (!steps.length) buildSteps();
+  const keyAt = (s) => (s.t === 'donor' ? s.d : s.t === 'prize' ? prizes[s.i].donor : '');
+  const cur = Math.min(stepIdx, steps.length - 1);
+  for (let k = cur; k >= 0; k--) { const key = keyAt(steps[k]); if (GALLERY.indexOf(key) > -1) return key; }
+  for (let k = cur + 1; k < steps.length; k++) { const key = keyAt(steps[k]); if (GALLERY.indexOf(key) > -1) return key; }   // 아직 앞에 없으면 다음 기증자
+  return GALLERY[0];
+}
 
 function renderWinners() {
   const groups = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.ws.length);
