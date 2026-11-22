@@ -452,7 +452,7 @@ const GALLERY = ['chancellor', 'research', 'dean', 'iucf'];
 
 /* 「2026년 한울회 경품 및 기념품 후보」 시트의 경품 + 경품(경영진 협찬) — ⚙ 설정에서 수량·이름 변경
    추첨 순서는 무작위로 섞임 (같은 분의 협찬 경품은 한 묶음 · last:true 는 항상 맨 마지막) */
-const PRIZES_VERSION = '2026-11-23';   // 목록을 바꾸면 이 값을 바꿔야 노트북에 저장된 예전 목록이 새 목록으로 교체됨
+const PRIZES_VERSION = '2026-11-23b';   // 목록을 바꾸면 이 값을 바꿔야 노트북에 저장된 예전 목록이 새 목록으로 교체됨
 const PRIZES_DEFAULT = [
   { name: '스타벅스 상품권 1만원권', qty: 10, donor: 'president' },
   { name: '올리브영 기프트카드 3만원권', qty: 5, donor: '' },
@@ -470,7 +470,7 @@ const PRIZES_DEFAULT = [
   { name: 'AMAN 마운틴 허니', qty: 1, donor: 'chancellor' },
   { name: '롯데 상품권 10만원권', qty: 1, donor: 'chancellor' },
   { name: '신세계 상품권 10만원권', qty: 1, donor: 'chancellor' },
-  { name: '상품권 50만원권', qty: 1, donor: 'dean', last: true },   // 공과대학장님 협찬 — 무조건 맨 마지막
+  { name: '상품권 50만원권', qty: 0, donor: 'dean', last: true },   // 공과대학장님 협찬 — 추첨하지 않음(수량 0), 맨 마지막에 감사 현수막만
 ];
 
 /* ═════════════ 유틸 ═════════════ */
