@@ -167,6 +167,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .dtop{display:flex;justify-content:center;align-items:center;gap:26px;margin-top:6px}
 .dtop .kicker{font-size:26px}
 .chip{font-family:var(--serif);font-size:26px;font-weight:600;color:#f6d7dc;border:1px solid rgba(178,58,76,.7);background:rgba(127,29,45,.35);padding:8px 26px;border-radius:999px;letter-spacing:.06em}
+.chip.own{color:var(--gold-l);border-color:rgba(201,162,74,.6);background:rgba(201,162,74,.10)}
 .pname{font-size:104px;font-weight:700;line-height:1.18;margin-top:28px;word-break:keep-all;max-width:1500px}
 .pname.s{font-size:84px}
 .pqty{font-family:var(--serif);font-size:30px;color:var(--mist);margin-top:14px;letter-spacing:.08em}
@@ -452,7 +453,7 @@ const GALLERY = ['chancellor', 'research', 'dean', 'iucf'];
 
 /* 「2026년 한울회 경품 및 기념품 후보」 시트의 경품 + 경품(경영진 협찬) — ⚙ 설정에서 수량·이름 변경
    추첨 순서는 무작위로 섞임 (같은 분의 협찬 경품은 한 묶음 · first:true 는 항상 맨 앞, last:true 는 항상 맨 마지막) */
-const PRIZES_VERSION = '2026-11-23d';   // 목록을 바꾸면 이 값을 바꿔야 노트북에 저장된 예전 목록이 새 목록으로 교체됨
+const PRIZES_VERSION = '2026-11-23e';   // 목록을 바꾸면 이 값을 바꿔야 노트북에 저장된 예전 목록이 새 목록으로 교체됨
 const PRIZES_DEFAULT = [
   { name: '스타벅스 상품권 1만원권', qty: 9, donor: 'president', first: true },   // 맨 앞 고정 — 「한 번에」로 빠르게 시작
   { name: '올리브영 기프트카드 3만원권', qty: 5, donor: '' },
@@ -460,7 +461,7 @@ const PRIZES_DEFAULT = [
   { name: '프라다 립밤', qty: 3, donor: '' },
   { name: 'LG 프라엘 수퍼폼 갈바닉 부스터', qty: 2, donor: '' },
   { name: 'Apple 에어팟', qty: 1, donor: '' },
-  { name: '산학협력단장님 협찬 선물', qty: 1, donor: 'iucf' },
+  { name: '키보드 세트', qty: 1, donor: 'iucf' },
   { name: 'Body Scrub & Body Wash', qty: 2, donor: 'research' },
   { name: 'Fiskars 가위', qty: 3, donor: 'research' },
   { name: 'Diptyque 디퓨저', qty: 1, donor: 'research' },
@@ -901,7 +902,7 @@ function renderDrawStep() {
   const many = p.qty > 6;
   const d = p.donor && DONORS[p.donor];
   body.innerHTML =
-    `<div class="dtop"><span class="kicker">Lucky Draw · ${pad(ordinal)} / ${pad(prizeCount)}</span>${d ? `<span class="chip">${esc(d.title)} 협찬</span>` : ''}</div>
+    `<div class="dtop"><span class="kicker">Lucky Draw · ${pad(ordinal)} / ${pad(prizeCount)}</span>${d ? `<span class="chip">${esc(d.title)} 협찬</span>` : '<span class="chip own">한울회에서 준비한 선물</span>'}</div>
      <div class="pname foil${p.name.length > 14 || many ? ' s' : ''}">${esc(p.name)}</div>
      <div class="pqty">${p.qty}명 추첨 · 남은 <b>${left}</b>명 &nbsp;·&nbsp; 추첨 대상 ${pool().length}명</div>
      <div class="roller${many ? ' compact' : ''}"><div class="nm idle" id="rlName">${left ? 'Ready' : 'Complete'}</div><div class="af" id="rlAff"></div></div>
