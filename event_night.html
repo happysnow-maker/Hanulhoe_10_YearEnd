@@ -175,6 +175,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .roller{margin-top:38px;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
 .roller .nm{font-size:170px;font-weight:900;line-height:1.1;letter-spacing:.08em;color:var(--ivory)}
 .roller .nm.idle{font-family:var(--latin);font-weight:400;font-size:64px;letter-spacing:.3em;color:rgba(201,162,74,.6)}
+.roller .nm small.ps{font-size:.3em;font-weight:600;letter-spacing:.06em;margin-left:.45em}
 .roller .nm.spin{color:rgba(247,240,225,.75)}
 .roller .af{font-family:var(--sans);font-size:30px;color:var(--mist);margin-top:12px;min-height:1.3em}
 .roller.compact{min-height:150px;margin-top:24px}
@@ -182,6 +183,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wins{display:flex;flex-wrap:wrap;gap:14px 16px;justify-content:center;margin-top:28px;max-width:1560px}
 .win{border:1px solid var(--line);padding:10px 26px;font-size:30px;font-weight:600;background:rgba(201,162,74,.07);cursor:pointer;transition:all .3s}
 .win small{font-family:var(--sans);font-size:16px;font-weight:400;color:var(--mist);margin-left:10px}
+.win i.ps{font-style:normal;font-size:.62em;font-weight:500;color:var(--gold-l);margin-left:6px}
 .win:hover{border-color:var(--wine-l);background:rgba(127,29,45,.3)}
 .win.new{animation:pop .8s cubic-bezier(.2,.9,.3,1.3)}
 @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
@@ -198,6 +200,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .gifts{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 46px;margin-top:40px;max-width:1500px}
 .gifts span{font-size:36px;font-weight:600;color:var(--ivory)}
 .gifts span i{font-variant-numeric:lining-nums;font-style:normal;font-family:var(--latin);color:var(--gold);margin-left:8px;font-size:34px}
+.gifts span em small{font-size:.72em;opacity:.85}
 .gifts span em{font-style:normal;font-family:var(--sans);font-size:28px;font-weight:500;color:var(--gold-l);margin-left:14px}
 .gifts span::before{content:'✦';color:var(--gold);font-size:22px;margin-right:16px;vertical-align:middle}
 #donor .thx{font-size:34px;color:var(--gold-l);margin-top:36px;letter-spacing:.2em}
@@ -210,6 +213,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wlist div{break-inside:avoid;margin-bottom:22px}
 .wlist h4{font-size:26px;color:var(--gold-l);font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px;margin-bottom:6px}
 .wlist p{font-family:var(--sans);font-size:21px;line-height:1.6;color:var(--ivory)}
+.wlist p small{font-size:.74em;color:var(--gold-l)}
 .wlist p b{font-weight:400;white-space:nowrap}
 .wlist p span{color:var(--mist);font-size:16px;margin-left:6px}
 
@@ -397,7 +401,7 @@ table.pz tr.don td{background:rgba(127,29,45,.12)}
 
     <div class="card">
       <h3>2. 경품 추첨 명단 <span id="rosterCnt" style="font-family:var(--sans);font-size:14px;color:#9fb2a6"></span></h3>
-      <p class="h">「응답 시트에서 불러오기」는 '참석'으로 회신한 분을 가져옵니다. 당일 불참자는 지우고, 현장 참석자는 추가한 뒤 저장하세요. 한 줄에 <b>이름,소속</b>.</p>
+      <p class="h">「응답 시트에서 불러오기」는 '참석'으로 회신한 분을 가져옵니다. 당일 불참자는 지우고, 현장 참석자는 추가한 뒤 저장하세요. 한 줄에 <b>이름,소속,직위</b> (직위는 생략 가능 · 이름 옆에 작게 표시).</p>
       <div class="row" style="margin-bottom:10px">
         <button class="sbtn" onclick="loadAttendees()">응답 시트에서 불러오기</button>
         <span id="rosterMsg"></span>
@@ -920,7 +924,7 @@ function renderDrawStep() {
 }
 function winChip(w, isNew) {
   const idx = wins.indexOf(w);
-  return `<button class="win${isNew ? ' new' : ''}" title="클릭: 불참 처리 후 재추첨" onclick="markAbsent(${idx})">${esc(w.name)}<small>${esc(w.aff || '')}</small></button>`;
+  return `<button class="win${isNew ? ' new' : ''}" title="클릭: 불참 처리 후 재추첨" onclick="markAbsent(${idx})">${esc(w.name)}${w.pos ? `<i class="ps">${esc(w.pos)}</i>` : ''}<small>${esc(w.aff || '')}</small></button>`;
 }
 function renderDrawCtl() {
   const s = steps[stepIdx]; if (!s || s.t !== 'prize') return;
@@ -939,7 +943,7 @@ function animateName(final, ms) {
     (function step() {
       const t = (performance.now() - start) / ms;
       if (t >= 1) {
-        el.className = 'nm foil'; el.textContent = final.name; af.textContent = final.aff || '';
+        el.className = 'nm foil'; el.innerHTML = esc(final.name) + (final.pos ? `<small class="ps">${esc(final.pos)}</small>` : ''); af.textContent = final.aff || '';
         return resolve();
       }
       el.textContent = pl[rnd(pl.length)].name;
@@ -957,7 +961,7 @@ async function drawOne(fast) {
   spinning = true; $('#drawCtl').style.opacity = .3;
   const w = pl[rnd(pl.length)];
   await animateName(w, fast ? 650 : 2600);
-  const rec = { pi: s.i, name: w.name, aff: w.aff || '' };
+  const rec = { pi: s.i, name: w.name, aff: w.aff || '', pos: w.pos || '' };
   wins.push(rec); LS.set('wins', wins);
   $('#winBox').insertAdjacentHTML('beforeend', winChip(rec, true));
   burst(960, 560, fast ? 60 : 150);
@@ -1000,7 +1004,7 @@ function renderDonor(key, after) {
     (d.note && !items.length ? `<span>${esc(d.note)}</span>` : '');
   if (after) {   // 그분 경품을 모두 뽑은 뒤: 당첨자와 함께 기념 촬영
     $('#dnGifts').innerHTML = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.p.donor === key && +g.p.qty > 0)
-      .map((g) => `<span>${esc(g.p.name)}<em>${g.ws.length ? g.ws.map((w) => esc(w.name)).join(' · ') : '—'}</em></span>`).join('');
+      .map((g) => `<span>${esc(g.p.name)}<em>${g.ws.length ? g.ws.map((w) => esc(w.name) + (w.pos ? `<small> ${esc(w.pos)}</small>` : '')).join(' · ') : '—'}</em></span>`).join('');
   }
   $('#dnPg').textContent = mode === 'gallery' ? (galIdx + 1) + ' / ' + GALLERY.length + '   ‹ ›' : '';
   showScene('donor');
@@ -1020,7 +1024,7 @@ function renderWinners() {
   const groups = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.ws.length || (!(+g.p.qty > 0) && g.p.donor));
   $('#wList').innerHTML = groups.map((g) => !(+g.p.qty > 0)
     ? `<div><h4>${esc(g.p.name)}</h4><p>한울회 전체<span>${esc((DONORS[g.p.donor] || {}).title || '')} 협찬</span></p></div>`
-    : `<div><h4>${esc(g.p.name)}</h4><p>${g.ws.length > 6 ? g.ws.map((w) => `<b>${esc(w.name)}</b>`).join(' · ') : g.ws.map((w) => `${esc(w.name)}<span>${esc(w.aff || '')}</span>`).join('<br>')}</p></div>`).join('') ||
+    : `<div><h4>${esc(g.p.name)}</h4><p>${g.ws.length > 6 ? g.ws.map((w) => `<b>${esc(w.name)}${w.pos ? `<small> ${esc(w.pos)}</small>` : ''}</b>`).join(' · ') : g.ws.map((w) => `${esc(w.name)}${w.pos ? `<small> ${esc(w.pos)}</small>` : ''}<span>${esc(w.aff || '')}</span>`).join('<br>')}</p></div>`).join('') ||
     '<p class="muted" style="font-size:28px;text-align:center">아직 당첨자가 없습니다.</p>';
   const n = wins.length;
   $('#wList').style.fontSize = n > 40 ? '20px' : '';
@@ -1031,7 +1035,7 @@ function renderWinners() {
 function openSetup() {
   $('#setup').classList.add('show');
   $('#keyIn').value = LS.get('key', '');
-  $('#rosterIn').value = roster.map((r) => r.name + (r.aff ? ',' + r.aff : '')).join('\n');
+  $('#rosterIn').value = roster.map((r) => r.name + (r.aff || r.pos ? ',' + (r.aff || '') : '') + (r.pos ? ',' + r.pos : '')).join('\n');
   $('#rosterCnt').textContent = '· 현재 ' + roster.length + '명';
   renderPrizeTable();
 }
@@ -1055,8 +1059,9 @@ function loadAttendees() {
 }
 function saveRoster() {
   roster = $('#rosterIn').value.split('\n').map((l) => {
-    const i = l.indexOf(',');
-    return i < 0 ? { name: l.trim(), aff: '' } : { name: l.slice(0, i).trim(), aff: l.slice(i + 1).trim() };
+    const p = l.split(',').map((x) => x.trim());   // 이름,소속[,직위]
+    const pos = p.length >= 3 ? p.pop() : '';
+    return { name: p[0] || '', aff: p.slice(1).join(','), pos };
   }).filter((r) => r.name);
   LS.set('roster', roster);
   $('#rosterCnt').textContent = '· 현재 ' + roster.length + '명';
