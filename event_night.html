@@ -190,16 +190,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #burst{position:absolute;inset:0;pointer-events:none;z-index:6}
 
 /* 기증자 */
-#donor{padding:100px 160px 180px}
+#donor{padding:110px 160px}
 #donor .script{font-size:92px;line-height:1}
 #donor .ttl{font-size:56px;font-weight:700;margin-top:14px;letter-spacing:.04em}
-.banner{margin-top:28px;padding:16px;background:linear-gradient(135deg,#f6e6b4,#b88a2e 40%,#f3dfa0 60%,#a87a24);box-shadow:0 30px 90px rgba(0,0,0,.55)}
-.banner img{display:block;width:880px;height:auto;image-rendering:auto}
-.gifts{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 46px;margin-top:32px;max-width:1500px}
+.banner{margin-top:36px;padding:16px;background:linear-gradient(135deg,#f6e6b4,#b88a2e 40%,#f3dfa0 60%,#a87a24);box-shadow:0 30px 90px rgba(0,0,0,.55)}
+.banner img{display:block;width:1000px;height:auto;image-rendering:auto}
+.gifts{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 46px;margin-top:40px;max-width:1500px}
 .gifts span{font-size:36px;font-weight:600;color:var(--ivory)}
 .gifts span i{font-variant-numeric:lining-nums;font-style:normal;font-family:var(--latin);color:var(--gold);margin-left:8px;font-size:34px}
+.gifts span em{font-style:normal;font-family:var(--sans);font-size:28px;font-weight:500;color:var(--gold-l);margin-left:14px}
 .gifts span::before{content:'✦';color:var(--gold);font-size:22px;margin-right:16px;vertical-align:middle}
-#donor .thx{font-size:34px;color:var(--gold-l);margin-top:26px;letter-spacing:.2em}
+#donor .thx{font-size:34px;color:var(--gold-l);margin-top:36px;letter-spacing:.2em}
 #donor .pg{position:absolute;right:90px;bottom:80px;font-family:var(--latin);font-size:24px;letter-spacing:.2em;color:rgba(201,162,74,.6)}
 
 /* 추첨 시작·끝 · 당첨자 */
@@ -350,7 +351,6 @@ table.pz tr.don td{background:rgba(127,29,45,.12)}
     <div class="gifts rise d3" id="dnGifts"></div>
     <div class="thx rise d4">진심으로 감사드립니다</div>
     <div class="pg" id="dnPg"></div>
-    <div class="dctl" id="dnCtl"></div>
   </section>
 
   <!-- 당첨자 전체 -->
@@ -836,9 +836,14 @@ let steps = [], stepIdx = LS.get('drawStep', 0), spinning = false;
 function buildSteps() {
   steps = [{ t: 'intro' }];
   let prev = null;
+  const hasPhoto = (k) => k && DONORS[k] && DONORS[k].photo;
+  const drawCount = (k) => prizes.filter((p) => p.donor === k && +p.qty > 0).length;
   prizes.forEach((p, i) => {
-    if (p.donor && DONORS[p.donor] && DONORS[p.donor].photo && p.donor !== prev) steps.push({ t: 'donor', d: p.donor });
+    if (hasPhoto(p.donor) && p.donor !== prev) steps.push({ t: 'donor', d: p.donor });
     if (+p.qty > 0) steps.push({ t: 'prize', i });
+    const next = prizes[i + 1];
+    // 협찬 경품이 2종 이상인 분: 그분 경품을 다 뽑으면 현수막을 다시 띄워 당첨자와 기념 촬영
+    if (hasPhoto(p.donor) && (!next || next.donor !== p.donor) && drawCount(p.donor) >= 2) steps.push({ t: 'donor', d: p.donor, after: true });
     prev = p.donor || null;
   });
   steps.push({ t: 'end' });
@@ -874,7 +879,7 @@ function drawStepMove(dir) {
 }
 function renderDrawStep() {
   const s = steps[stepIdx];
-  if (s.t === 'donor') { renderDonor(s.d, true); return; }
+  if (s.t === 'donor') { renderDonor(s.d, s.after); return; }
   showScene('draw');
   const body = $('#drawBody'), ctl = $('#drawCtl');
   const prizeCount = prizes.filter((p) => +p.qty > 0).length;
@@ -882,7 +887,7 @@ function renderDrawStep() {
     body.innerHTML = `<div class="kicker rise" style="margin-top:130px">Lucky Draw</div>
       <div class="pname foil rise d1" style="font-size:150px">경품 추첨</div>
       <svg class="divider rise d2"><use href="#div"/></svg>
-      <div class="pqty rise d3" style="font-size:36px">${prizeCount}종 · <b>${totalQty()}</b>개의 선물 &nbsp;·&nbsp; 추첨 대상 <b>${pool().length}</b>명</div>
+      <div class="pqty rise d3" style="font-size:36px">${prizeCount}종 · <b>${totalQty()}</b>개의 선물</div>
       <div class="script rise d4" style="font-size:80px;margin-top:40px">Good luck to all</div>` +
       (serverAttend != null && serverAttend !== roster.length
         ? `<div style="font-family:var(--sans);font-size:22px;color:#f0b3bc;margin-top:26px">⚠ 응답 시트 참석 ${serverAttend}명 · 저장된 추첨 명단 ${roster.length}명 — 최신 명단이 필요하면 ⚙ 설정 → 「응답 시트에서 불러오기」 → 「명단 저장」</div>` : '');
@@ -905,7 +910,7 @@ function renderDrawStep() {
   body.innerHTML =
     `<div class="dtop"><span class="kicker">Lucky Draw · ${pad(ordinal)} / ${pad(prizeCount)}</span>${d ? `<span class="chip">${esc(d.title)} 협찬</span>` : '<span class="chip own">한울회에서 준비한 선물</span>'}</div>
      <div class="pname foil${p.name.length > 14 || many ? ' s' : ''}">${esc(p.name)}</div>
-     <div class="pqty">${p.qty}명 추첨 · 남은 <b>${left}</b>명 &nbsp;·&nbsp; 추첨 대상 ${pool().length}명</div>
+     <div class="pqty">${p.qty}명 추첨 · 남은 <b>${left}</b>명</div>
      <div class="roller${many ? ' compact' : ''}"><div class="nm idle" id="rlName">${left ? 'Ready' : 'Complete'}</div><div class="af" id="rlAff"></div></div>
      <div class="wins${many ? ' many' : ''}" id="winBox">${ws.map((w) => winChip(w)).join('')}</div>`;
   renderDrawCtl();
@@ -982,7 +987,7 @@ function markAbsent(idx) {
 
 /* 기증자 감사 · 기념 촬영 */
 let galIdx = 0;
-function renderDonor(key, inDraw) {
+function renderDonor(key, after) {
   const d = DONORS[key];
   $('#dnImg').src = d.photo;
   $('#dnBanner').style.display = d.photo ? '' : 'none';
@@ -990,18 +995,11 @@ function renderDonor(key, inDraw) {
   $('#dnTitle').textContent = d.title + (items.length && items.every((p) => !(+p.qty > 0)) ? '께서 보내주신 마음' : '께서 보내주신 선물');
   $('#dnGifts').innerHTML = items.map((p) => `<span>${esc(p.name)}${p.qty > 1 ? `<i>× ${p.qty}</i>` : ''}</span>`).join('') +
     (d.note && !items.length ? `<span>${esc(d.note)}</span>` : '');
-  $('#dnPg').textContent = mode === 'gallery' ? (galIdx + 1) + ' / ' + GALLERY.length : '';
-  if (mode === 'gallery') {
-    $('#dnCtl').innerHTML =
-      `<button class="btn ghost" onclick="go(-1)"${galIdx ? '' : ' disabled'}>‹ 이전 분</button>` +
-      `<button class="btn ghost" onclick="go(1)"${galIdx < GALLERY.length - 1 ? '' : ' disabled'}>다음 분 ›</button>` +
-      `<button class="btn" onclick="openDraw()">경품 추첨 화면으로</button>`;
-  } else {
-    const drawsNext = items.some((p) => +p.qty > 0);   // 추첨할 경품이 있으면 '추첨 시작', 감사 화면만이면 '마치기'
-    $('#dnCtl').innerHTML =
-      `<button class="btn ghost" onclick="drawStepMove(-1)">‹ 이전</button>` +
-      `<button class="btn solid" onclick="drawStepMove(1)">${drawsNext ? '✦ 추첨 시작 ›' : '다음 ›'}</button>`;
+  if (after) {   // 그분 경품을 모두 뽑은 뒤: 당첨자와 함께 기념 촬영
+    $('#dnGifts').innerHTML = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.p.donor === key && +g.p.qty > 0)
+      .map((g) => `<span>${esc(g.p.name)}<em>${g.ws.length ? g.ws.map((w) => esc(w.name)).join(' · ') : '—'}</em></span>`).join('');
   }
+  $('#dnPg').textContent = mode === 'gallery' ? (galIdx + 1) + ' / ' + GALLERY.length + '   ‹ ›' : '';
   showScene('donor');
 }
 function renderGallery() { mode = 'gallery'; renderDonor(GALLERY[galIdx]); }
