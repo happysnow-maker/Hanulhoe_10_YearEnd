@@ -1051,7 +1051,13 @@ function saveKey() {
   adminApi({ action: 'admin' }).then((d) => {
     $('#keyMsg').textContent = d.ok ? '✔ 연결되었습니다 (현재 단계: ' + d.phase + ')' : '✕ ' + d.error;
     $('#keyMsg').className = d.ok ? 'ok' : 'bad';
+    if (d.ok) cacheMembers();
   }).catch((e) => { $('#keyMsg').textContent = '✕ ' + e.message; $('#keyMsg').className = 'bad'; });
+}
+/* 회원 명단(소속·직위)을 이 노트북에 미리 저장 → 인터넷이 끊겨도 「현장 참석자 추가」 동작 */
+function cacheMembers() {
+  if (!LS.get('key', '')) return;
+  api({ action: 'members', key: LS.get('key', '') }).then((d) => { if (d.ok && d.list.length) LS.set('members', d.list); }).catch(() => {});
 }
 function loadAttendees() {
   $('#rosterMsg').textContent = '불러오는 중…';
@@ -1060,6 +1066,7 @@ function loadAttendees() {
     $('#rosterIn').value = d.list.map((r) => [r.name, r.aff || '', r.pos || ''].join(',')).join('\n');
     $('#rosterMsg').textContent = '✔ 참석 회신 ' + d.list.length + '명을 불러왔습니다 — 확인 후 「명단 저장」';
     $('#rosterMsg').className = 'ok';
+    cacheMembers();
   }).catch((e) => { $('#rosterMsg').textContent = '✕ ' + e.message; $('#rosterMsg').className = 'bad'; });
 }
 /* 현장 참석자 추가: 이름만 넣으면 회원 명단(서버)에서 소속·직위를 찾아 명단에 붙이고 바로 저장 */
@@ -1177,6 +1184,11 @@ stage.addEventListener('dblclick', toggleFs);
 /* 시작 */
 markProgram();
 showScene('cover');
+/* 인터넷이 끊겨도 보이도록: 사업보고·기증자 사진을 미리 받아 두고, 회원 명단도 최신으로 저장 */
+window.__preload = [];
+for (let i = 1; i <= REPORT_PAGES; i++) { const im = new Image(); im.src = 'report/p' + pad(i) + '.jpg'; window.__preload.push(im); }
+Object.values(DONORS).forEach((d) => { if (d.photo) { const im = new Image(); im.src = d.photo; window.__preload.push(im); } });
+cacheMembers();
 </script>
 </body>
 </html>
