@@ -401,12 +401,17 @@ table.pz tr.don td{background:rgba(127,29,45,.12)}
 
     <div class="card">
       <h3>2. 경품 추첨 명단 <span id="rosterCnt" style="font-family:var(--sans);font-size:14px;color:#9fb2a6"></span></h3>
-      <p class="h">「응답 시트에서 불러오기」는 '참석'으로 회신한 분을 가져옵니다. 당일 불참자는 지우고, 현장 참석자는 추가한 뒤 저장하세요. 한 줄에 <b>이름,소속,직위</b> (직위는 생략 가능 · 이름 옆에 작게 표시).</p>
+      <p class="h">「응답 시트에서 불러오기」는 '참석'으로 회신한 분을 <b>소속·직위까지</b> 가져옵니다(회원 명단 202609 기준). 당일 불참자는 그 줄을 지우고 「명단 저장」을 누르세요. 회신 없이 오신 분은 아래 <b>현장 참석자 추가</b>에 이름만 넣으면 소속·직위가 자동으로 붙어 바로 저장됩니다. 직접 쓸 때는 한 줄에 <b>이름,소속,직위</b>.</p>
       <div class="row" style="margin-bottom:10px">
         <button class="sbtn" onclick="loadAttendees()">응답 시트에서 불러오기</button>
         <span id="rosterMsg"></span>
       </div>
-      <textarea id="rosterIn" placeholder="홍길동,서울 총무처 인사팀"></textarea>
+      <div class="row" style="margin-bottom:10px">
+        <input id="walkIn" placeholder="현장 참석자 이름" style="width:200px" onkeydown="if(event.key==='Enter')addWalkIn()">
+        <button class="sbtn" onclick="addWalkIn()">＋ 현장 참석자 추가</button>
+        <span id="walkMsg"></span>
+      </div>
+      <textarea id="rosterIn" placeholder="홍길동,서울 총무처 인사팀,과장"></textarea>
       <div class="row"><button class="sbtn" onclick="saveRoster()">명단 저장</button></div>
     </div>
 
@@ -1052,10 +1057,38 @@ function loadAttendees() {
   $('#rosterMsg').textContent = '불러오는 중…';
   adminApi({ action: 'attendees' }).then((d) => {
     if (!d.ok) throw new Error(d.error);
-    $('#rosterIn').value = d.list.map((r) => r.name + (r.aff ? ',' + r.aff : '')).join('\n');
+    $('#rosterIn').value = d.list.map((r) => [r.name, r.aff || '', r.pos || ''].join(',')).join('\n');
     $('#rosterMsg').textContent = '✔ 참석 회신 ' + d.list.length + '명을 불러왔습니다 — 확인 후 「명단 저장」';
     $('#rosterMsg').className = 'ok';
   }).catch((e) => { $('#rosterMsg').textContent = '✕ ' + e.message; $('#rosterMsg').className = 'bad'; });
+}
+/* 현장 참석자 추가: 이름만 넣으면 회원 명단(서버)에서 소속·직위를 찾아 명단에 붙이고 바로 저장 */
+async function addWalkIn() {
+  const name = $('#walkIn').value.trim(), msg = $('#walkMsg');
+  if (!name) return;
+  const ns = (x) => String(x || '').replace(/\s/g, '');
+  const lines = $('#rosterIn').value.split('\n').filter((l) => l.trim());
+  let members = LS.get('members', null);
+  if (!members) {
+    msg.textContent = '회원 명단 확인 중…'; msg.className = '';
+    try { const d = await adminApi({ action: 'members' }); if (d.ok) { members = d.list; LS.set('members', members); } } catch (e) {}
+  }
+  let hit = (members || []).filter((m) => ns(m.name) === ns(name));
+  if (hit.length > 1) {
+    const pick = prompt('동명이인이 있습니다. 번호를 입력하세요:\n' + hit.map((m, i) => `${i + 1}. ${m.name} · ${m.aff} ${m.pos}`).join('\n'), '1');
+    if (pick == null) return;
+    hit = [hit[Math.max(0, Math.min(hit.length - 1, (parseInt(pick, 10) || 1) - 1))]];
+  }
+  const m = hit[0];
+  if (lines.some((l) => ns(l.split(',')[0]) === ns(name) && (!m || l.indexOf(m.aff) > -1))) {
+    msg.textContent = '이미 명단에 있습니다: ' + name; msg.className = 'bad'; return;
+  }
+  lines.push(m ? [m.name, m.aff, m.pos].join(',') : name);
+  $('#rosterIn').value = lines.join('\n');
+  saveRoster();
+  $('#walkIn').value = '';
+  msg.textContent = m ? `✔ 추가·저장: ${m.name} (${m.aff} ${m.pos})` : `✔ 추가·저장: ${name} — 회원 명단에 없어 이름만 추가했습니다`;
+  msg.className = 'ok';
 }
 function saveRoster() {
   roster = $('#rosterIn').value.split('\n').map((l) => {
