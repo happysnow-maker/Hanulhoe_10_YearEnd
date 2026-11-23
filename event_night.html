@@ -210,6 +210,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wlist div{break-inside:avoid;margin-bottom:22px}
 .wlist h4{font-size:26px;color:var(--gold-l);font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px;margin-bottom:6px}
 .wlist p{font-family:var(--sans);font-size:21px;line-height:1.6;color:var(--ivory)}
+.wlist p b{font-weight:400;white-space:nowrap}
 .wlist p span{color:var(--mist);font-size:16px;margin-left:6px}
 
 /* ── 하단 메뉴 (마우스를 올리면 표시) ── */
@@ -631,6 +632,7 @@ function go(dir) {
   } else if (mode === 'draw') drawStepMove(dir);
   else if (mode === 'gallery') { const n = galIdx + dir; if (n >= 0 && n < GALLERY.length) { galIdx = n; renderGallery(); } }
   else if (mode === 'winner') { mode = 'elect'; showScene('elect'); startElect(); }
+  else if (mode === 'winners') { if (dir > 0) showDeck('a' + AGENDA.findIndex((a) => (a.plain || a.t) === '폐회')); else openDraw(); }   // 당첨자 명단 → 폐회
 }
 function escBack() {
   if (mode === 'deck') { if (DECK[deckIdx] !== 'program') showDeck('program'); return; }
@@ -842,8 +844,8 @@ function buildSteps() {
     if (hasPhoto(p.donor) && p.donor !== prev) steps.push({ t: 'donor', d: p.donor });
     if (+p.qty > 0) steps.push({ t: 'prize', i });
     const next = prizes[i + 1];
-    // 협찬 경품이 2종 이상인 분: 그분 경품을 다 뽑으면 현수막을 다시 띄워 당첨자와 기념 촬영
-    if (hasPhoto(p.donor) && (!next || next.donor !== p.donor) && drawCount(p.donor) >= 2) steps.push({ t: 'donor', d: p.donor, after: true });
+    // 추첨 경품이 있는 협찬자: 그분 경품을 다 뽑으면 현수막을 다시 띄워 당첨자와 기념 촬영
+    if (hasPhoto(p.donor) && (!next || next.donor !== p.donor) && drawCount(p.donor) >= 1) steps.push({ t: 'donor', d: p.donor, after: true });
     prev = p.donor || null;
   });
   steps.push({ t: 'end' });
@@ -873,7 +875,8 @@ let serverAttend = null;
 function drawStepMove(dir) {
   if (spinning) return;
   const n = stepIdx + dir;
-  if (n < 0 || n >= steps.length) { if (n < 0) backToAgenda('draw'); return; }
+  if (n < 0) { backToAgenda('draw'); return; }
+  if (n >= steps.length) { openModule('winners'); return; }   // 추첨 끝 → 당첨자 명단
   stepIdx = n; LS.set('drawStep', stepIdx);
   renderDrawStep();
 }
@@ -899,8 +902,8 @@ function renderDrawStep() {
     body.innerHTML = `<div class="kicker rise" style="margin-top:150px">Thank you</div>
       <div class="pname foil rise d1" style="font-size:130px">모든 추첨이 끝났습니다</div>
       <svg class="divider rise d2"><use href="#div"/></svg>
-      <div class="pqty rise d3" style="font-size:34px">당첨자 <b>${wins.length}</b>명 · 기증해 주신 분들과 기념 촬영이 이어집니다</div>`;
-    ctl.innerHTML = `<button class="btn" onclick="openModule('winners')">당첨자 전체 보기</button><button class="btn solid" onclick="openModule('gallery')">기증자 기념 촬영 ›</button>`;
+      <div class="pqty rise d3" style="font-size:34px">당첨을 축하드립니다 · 함께해 주셔서 감사합니다</div>`;
+    ctl.innerHTML = `<button class="btn ghost" onclick="openModule('gallery')">기증자 기념 촬영</button><button class="btn solid" onclick="openModule('winners')">당첨자 명단 ›</button>`;
     return;
   }
   const i = s.i, p = prizes[i], ws = winsOf(i), left = Math.max(0, p.qty - ws.length);
@@ -993,7 +996,7 @@ function renderDonor(key, after) {
   $('#dnBanner').style.display = d.photo ? '' : 'none';
   const items = prizes.filter((p) => p.donor === key);
   $('#dnTitle').textContent = d.title + (items.length && items.every((p) => !(+p.qty > 0)) ? '께서 보내주신 마음' : '께서 보내주신 선물');
-  $('#dnGifts').innerHTML = items.map((p) => `<span>${esc(p.name)}${p.qty > 1 ? `<i>× ${p.qty}</i>` : ''}</span>`).join('') +
+  $('#dnGifts').innerHTML = items.map((p) => `<span>${esc(p.name)}${p.qty > 1 ? `<i>× ${p.qty}</i>` : ''}${!(+p.qty > 0) ? '<em>한울회 전체</em>' : ''}</span>`).join('') +
     (d.note && !items.length ? `<span>${esc(d.note)}</span>` : '');
   if (after) {   // 그분 경품을 모두 뽑은 뒤: 당첨자와 함께 기념 촬영
     $('#dnGifts').innerHTML = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.p.donor === key && +g.p.qty > 0)
@@ -1014,8 +1017,10 @@ function currentDrawDonor() {
 }
 
 function renderWinners() {
-  const groups = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.ws.length);
-  $('#wList').innerHTML = groups.map((g) => `<div><h4>${esc(g.p.name)}</h4><p>${g.ws.length > 6 ? g.ws.map((w) => esc(w.name)).join(' · ') : g.ws.map((w) => `${esc(w.name)}<span>${esc(w.aff || '')}</span>`).join('<br>')}</p></div>`).join('') ||
+  const groups = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.ws.length || (!(+g.p.qty > 0) && g.p.donor));
+  $('#wList').innerHTML = groups.map((g) => !(+g.p.qty > 0)
+    ? `<div><h4>${esc(g.p.name)}</h4><p>한울회 전체<span>${esc((DONORS[g.p.donor] || {}).title || '')} 협찬</span></p></div>`
+    : `<div><h4>${esc(g.p.name)}</h4><p>${g.ws.length > 6 ? g.ws.map((w) => `<b>${esc(w.name)}</b>`).join(' · ') : g.ws.map((w) => `${esc(w.name)}<span>${esc(w.aff || '')}</span>`).join('<br>')}</p></div>`).join('') ||
     '<p class="muted" style="font-size:28px;text-align:center">아직 당첨자가 없습니다.</p>';
   const n = wins.length;
   $('#wList').style.fontSize = n > 40 ? '20px' : '';
