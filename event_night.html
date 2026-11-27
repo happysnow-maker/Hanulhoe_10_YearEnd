@@ -212,6 +212,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wlist{columns:3;column-gap:60px;margin-top:40px;text-align:left;width:100%;font-size:24px;overflow:auto;flex:1}
 .wlist div{break-inside:avoid;margin-bottom:22px}
 .wlist h4{font-size:26px;color:var(--gold-l);font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px;margin-bottom:6px}
+.wlist h4 small{font-family:var(--sans);font-size:15px;font-weight:400;color:var(--mist);margin-left:10px;letter-spacing:.02em;white-space:nowrap}
 .wlist p{font-family:var(--sans);font-size:21px;line-height:1.6;color:var(--ivory)}
 .wlist p small{font-size:.74em;color:var(--gold-l)}
 .wlist p b{font-weight:400;white-space:nowrap}
@@ -379,6 +380,7 @@ table.pz tr.don td{background:rgba(127,29,45,.12)}
   <button onclick="openModule('draw')">경품 추첨</button>
   <button onclick="openModule('gallery')">기증자 촬영</button>
   <button onclick="openModule('winners')">당첨자</button>
+  <button onclick="saveWinnersPng()">당첨자 그림</button>
   <button onclick="exportWinners()">명단 저장</button>
   <span class="sep"></span>
   <button onclick="openSetup()">⚙ 설정</button>
@@ -1030,11 +1032,47 @@ function renderWinners() {
   const groups = prizes.map((p, i) => ({ p, ws: winsOf(i) })).filter((g) => g.ws.length || (!(+g.p.qty > 0) && g.p.donor));
   $('#wList').innerHTML = groups.map((g) => !(+g.p.qty > 0)
     ? `<div><h4>${esc(g.p.name)}</h4><p>한울회 전체<span>${esc((DONORS[g.p.donor] || {}).title || '')} 협찬</span></p></div>`
-    : `<div><h4>${esc(g.p.name)}</h4><p>${g.ws.length > 6 ? g.ws.map((w) => `<b>${esc(w.name)}${w.pos ? `<small> ${esc(w.pos)}</small>` : ''}</b>`).join(' · ') : g.ws.map((w) => `${esc(w.name)}${w.pos ? `<small> ${esc(w.pos)}</small>` : ''}<span>${esc(w.aff || '')}</span>`).join('<br>')}</p></div>`).join('') ||
+    : `<div><h4>${esc(g.p.name)}${g.p.donor && DONORS[g.p.donor] ? `<small>${esc(DONORS[g.p.donor].title)} 협찬</small>` : ''}</h4><p>${g.ws.length > 6 ? g.ws.map((w) => `<b>${esc(w.name)}${w.pos ? `<small> ${esc(w.pos)}</small>` : ''}</b>`).join(' · ') : g.ws.map((w) => `${esc(w.name)}${w.pos ? `<small> ${esc(w.pos)}</small>` : ''}<span>${esc(w.aff || '')}</span>`).join('<br>')}</p></div>`).join('') ||
     '<p class="muted" style="font-size:28px;text-align:center">아직 당첨자가 없습니다.</p>';
   const n = wins.length;
   $('#wList').style.fontSize = n > 40 ? '20px' : '';
   $('#wList').style.columns = n > 30 ? 4 : 3;
+}
+
+/* 「경품 당첨을 축하드립니다」 화면을 그대로 1920×1080 PNG로 저장 (기록은 읽기만 함) */
+function loadH2c() {
+  if (window.html2canvas) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const sc = Object.assign(document.createElement('script'), { src: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js' });
+    sc.onload = res; sc.onerror = () => rej(new Error('그림 저장 도구를 불러오지 못했습니다 (인터넷 연결 확인)'));
+    document.head.appendChild(sc);
+  });
+}
+async function winnersCanvas() {
+  openModule('winners');
+  await loadH2c();
+  await new Promise((r) => setTimeout(r, 1300));          // 화면이 다 떠오를 때까지
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  return html2canvas($('#stage'), {
+    width: 1920, height: 1080, windowWidth: 1920, windowHeight: 1080, scale: 1, backgroundColor: '#040d0a', useCORS: true, logging: false,
+    onclone: (doc) => {
+      const st = doc.getElementById('stage');
+      st.style.transform = 'none'; st.style.left = '0'; st.style.top = '0';
+      doc.head.insertAdjacentHTML('beforeend', '<style>*{animation:none!important;transition:none!important}</style>');
+      doc.querySelectorAll('.scene').forEach((e) => { if (e.id !== 'winners') e.remove(); });
+      doc.querySelectorAll('#winners .foil').forEach((e) => { e.style.background = 'none'; e.style.color = '#ecd28f'; e.style.webkitTextFillColor = '#ecd28f'; e.style.filter = 'none'; });
+      const b = doc.getElementById('burst'); if (b) b.remove();
+    },
+  });
+}
+async function saveWinnersPng() {
+  try {
+    const c = await winnersCanvas();
+    c.toBlob((blob) => {
+      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: '2026_송년의밤_경품당첨을축하드립니다.png' });
+      document.body.appendChild(a); a.click(); a.remove();
+    }, 'image/png');
+  } catch (e) { alert('그림 저장에 실패했습니다: ' + e.message); }
 }
 
 /* 당첨자 명단 페이지(기증자별 · 그림 저장 · CSV)로 추첨 기록을 넘겨서 새 탭으로 열기 — 기록은 읽기만 함 */
