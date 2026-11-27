@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경품 당첨자 명단</title>
+<!--
+  ▣ 2026 한울회 송년의 밤 — 경품 당첨자 명단 (기증자별)
+  ▣ 행사 때 「송년의밤_진행화면.html」을 띄운 그 노트북·그 브라우저에서, 같은 방식으로 열어야 기록이 보입니다.
+     (진행 화면과 같은 폴더에 두고 더블클릭 / 또는 인터넷 주소로 열었다면 …/Hanulhoe_10_YearEnd/winners.html)
+  ▣ 기록은 읽기만 합니다 — 진행 화면의 추첨 기록을 바꾸거나 지우지 않습니다.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Serif+KR:wght@500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#06120d; --bg1:#0b2219; --bg2:#123527; --card:#10301f;
+  --gold:#c9a24a; --gold-l:#efd99f; --gold-d:#8a6624;
+  --ivory:#f7f0e1; --mist:#a9bcb0; --wine-l:#d0606f;
+  --line:rgba(201,162,74,.45); --line2:rgba(201,162,74,.18);
+  --serif:'Noto Serif KR','Nanum Myeongjo',serif;
+  --latin:'Cormorant Garamond','Noto Serif KR',serif;
+  --sans:'Noto Sans KR','Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ivory);min-height:100vh;-webkit-font-smoothing:antialiased;font-variant-numeric:lining-nums;
+  background:radial-gradient(1200px 700px at 50% -10%,rgba(46,104,80,.5),transparent 65%),linear-gradient(180deg,var(--bg1),var(--bg0)) fixed;}
+.wrap{max-width:1180px;margin:0 auto;padding:48px 24px 80px}
+
+/* 머리 */
+header{text-align:center;margin-bottom:40px}
+.kicker{font-family:var(--latin);font-size:15px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--serif);font-weight:900;font-size:clamp(30px,4.6vw,48px);margin:10px 0 6px;
+  background:linear-gradient(180deg,#fff3cf,var(--gold) 60%,var(--gold-d));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mist);font-size:15px}
+.orn{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px auto 0;color:var(--gold)}
+.orn i{display:block;width:90px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.orn i:last-child{transform:scaleX(-1)}
+.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px}
+.stat{border:1px solid var(--line);border-radius:40px;padding:8px 20px;font-size:14px;color:var(--mist)}
+.stat b{font-family:var(--latin);font-size:22px;color:var(--gold-l);margin-left:6px;font-weight:600}
+
+/* 도구 */
+.tools{position:fixed;top:14px;right:16px;display:flex;gap:8px;z-index:5}
+.tools button{font:inherit;font-size:14px;font-weight:700;padding:9px 16px;border-radius:30px;border:1px solid var(--line);background:rgba(6,18,13,.75);color:var(--gold-l);cursor:pointer;backdrop-filter:blur(4px)}
+.tools button.solid{background:var(--gold-l);color:#1b1405;border-color:var(--gold-l)}
+
+/* 목차 */
+.toc{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 36px}
+.toc a{font-size:14px;color:var(--ivory);text-decoration:none;border:1px solid var(--line2);border-radius:30px;padding:7px 16px;background:rgba(255,255,255,.03)}
+.toc a:hover{border-color:var(--gold);color:var(--gold-l)}
+.toc a span{color:var(--gold);margin-left:6px;font-family:var(--latin);font-weight:600}
+
+/* 기증자 섹션 */
+section.donor{margin:0 0 44px;border:1px solid var(--line2);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(18,53,39,.65),rgba(8,26,18,.65))}
+.dhead{display:flex;align-items:center;gap:24px;padding:22px 26px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.dhead img{height:118px;width:auto;border-radius:10px;box-shadow:0 8px 26px rgba(0,0,0,.4);border:1px solid var(--line2)}
+.dhead .seal{width:86px;height:86px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-family:var(--latin);font-size:30px;color:var(--gold);background:radial-gradient(circle at 35% 30%,rgba(239,217,159,.18),transparent 60%)}
+.dtitle .k{font-family:var(--latin);font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.dtitle h2{font-family:var(--serif);font-weight:700;font-size:28px;margin:4px 0 2px}
+.dtitle p{color:var(--mist);font-size:14px}
+.thanks{padding:26px;text-align:center;font-family:var(--serif);font-size:19px;color:var(--gold-l)}
+.thanks small{display:block;font-family:var(--sans);font-size:14px;color:var(--mist);margin-top:6px}
+
+/* 경품 카드 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:22px 26px 26px}
+.prize{border:1px solid var(--line2);border-radius:14px;padding:18px 18px 14px;background:rgba(4,13,10,.35);position:relative}
+.prize::before{content:'';position:absolute;left:18px;right:18px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7}
+.pname{font-family:var(--serif);font-weight:700;font-size:18px;line-height:1.4;color:var(--ivory)}
+.pmeta{font-size:12.5px;color:var(--mist);margin:3px 0 12px}
+.pmeta .warn{color:var(--wine-l);font-weight:700}
+.prize ol{list-style:none;counter-reset:w}
+.prize li{counter-increment:w;display:flex;align-items:baseline;gap:10px;padding:7px 0;border-top:1px dashed var(--line2)}
+.prize li::before{content:counter(w);font-family:var(--latin);font-weight:600;color:var(--gold);min-width:18px;text-align:right;font-size:15px}
+.prize li b{font-family:var(--serif);font-size:17px;font-weight:700;white-space:nowrap}
+.prize li small{color:var(--gold-l);font-size:12.5px;margin-left:4px}
+.prize li span{color:var(--mist);font-size:13px;margin-left:auto;text-align:right;word-break:keep-all}
+.prize li.empty{color:var(--mist);font-size:13.5px}
+.prize li.empty::before{content:'–'}
+
+/* 기록 없음 */
+.none{max-width:640px;margin:20px auto;border:1px solid var(--line);border-radius:16px;padding:30px;line-height:1.85;color:var(--mist);background:rgba(4,13,10,.45)}
+.none h3{font-family:var(--serif);color:var(--gold-l);font-size:22px;margin-bottom:10px}
+.none b{color:var(--ivory)}
+footer{text-align:center;color:var(--mist);font-size:12.5px;margin-top:10px}
+
+@media (max-width:640px){
+  .wrap{padding:70px 16px 60px}
+  .dhead{padding:18px}.dhead img{height:auto;width:100%}
+  .grid{padding:16px;grid-template-columns:1fr}
+  .tools{left:16px;right:16px;justify-content:flex-end}
+}
+
+/* 인쇄: 크림 바탕으로 잉크 절약, 섹션이 페이지에 걸쳐 끊기지 않게 */
+@media print{
+  @page{size:A4 portrait;margin:12mm}
+  body{background:#fff;color:#24342c}
+  .tools,.toc{display:none}
+  .wrap{padding:0;max-width:none}
+  h1{color:#123527;background:none;-webkit-text-fill-color:#123527}
+  .kicker,.dtitle .k,.prize li::before{color:#8a6624}
+  .sub,.stat,.dtitle p,.pmeta,.prize li span,.thanks small{color:#5d6b63}
+  .stat{border-color:#d8c99f}.stat b{color:#8a6624}
+  section.donor{background:#fff;border-color:#d8c99f;break-inside:avoid-page;margin-bottom:16px}
+  .dhead{border-color:#e6dcc0}.dhead img{height:80px;box-shadow:none}
+  .prize{background:#fffdf7;border-color:#e6dcc0;break-inside:avoid}
+  .pname,.prize li b,.dtitle h2{color:#123527}
+  .prize li{border-color:#e6dcc0}.prize li small{color:#8a6624}
+  .thanks{color:#8a6624}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="tools">
+  <button onclick="saveCsv()">엑셀(CSV) 저장</button>
+  <button class="solid" onclick="print()">🖨 인쇄</button>
+</div>
+<div class="wrap">
+  <header>
+    <div class="kicker">Lucky Draw · Winners</div>
+    <h1>경품 당첨을 축하드립니다</h1>
+    <div class="sub">2026 한울회 정기총회 및 송년의 밤 · 2026. 11. 25 (수) · 르스타일</div>
+    <div class="orn"><i></i>✦<i></i></div>
+    <div class="stats" id="stats"></div>
+  </header>
+  <nav class="toc" id="toc"></nav>
+  <main id="list"></main>
+  <footer>진행 화면에 저장된 추첨 기록을 읽어 보여 줍니다 · 불참 처리된 분은 빠진 최종 당첨자</footer>
+</div>
+
+<script>
+/* 진행 화면(event_night.html)과 같은 기증자 정보 — 섹션 순서도 이 순서 */
+const DONORS = {
+  chancellor: { title: '총장님', photo: 'images/donor/총장님.png' },
+  research:   { title: '연구부총장님', photo: 'images/donor/연구부총장님.png' },
+  iucf:       { title: '산학협력단장님', photo: 'images/donor/산단장님_강현종.png' },
+  dean:       { title: '공과대학장님', photo: 'images/donor/공과대학장님_변중무.png' },
+  president:  { title: '한울회 회장', photo: '' },
+  '':         { title: '한울회', photo: '' },
+};
+const LS = (k, d) => { try { const v = localStorage.getItem('hanul26n_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const shortAff = (a) => String(a || '').replace(/부총장\((서울|ERICA)\)\s*/, '').replace(/^총장\s+/, '').trim();
+
+let prizes = LS('prizes', null), wins = LS('wins', []);
+
+// 미리보기용 예시 (주소 끝에 ?demo) — 실제 기록에는 영향 없음
+if (/[?&]demo\b/.test(location.search)) {
+  prizes = [
+    { name: '스타벅스 상품권 1만원권', qty: 9, donor: 'president' }, { name: '올리브영 기프트카드 3만원권', qty: 5, donor: '' },
+    { name: 'Apple 에어팟', qty: 1, donor: '' }, { name: '키보드 세트', qty: 1, donor: 'iucf' },
+    { name: 'Diptyque 디퓨저', qty: 1, donor: 'research' }, { name: 'Fiskars 가위', qty: 3, donor: 'research' },
+    { name: '롯데 상품권 10만원권', qty: 1, donor: 'chancellor' }, { name: 'AMAN 마운틴 허니', qty: 1, donor: 'chancellor' },
+    { name: '상품권 50만원권', qty: 0, donor: 'dean' },
+  ];
+  const pos = ['과장', '대리', '차장', '부장', '직원'], aff = ['서울 공과대학 RC 행정팀', 'ERICA 국제처 국제팀', '서울 총무처 재무팀', '서울 교무처 교원임용팀'];
+  let k = 1; wins = [];
+  prizes.forEach((p, i) => { for (let j = 0; j < Math.min(p.qty, i === 5 ? 2 : p.qty); j++) wins.push({ pi: i, name: '회원' + (k++), pos: pos[k % 5], aff: aff[k % 4] }); });
+}
+
+function groups() {
+  const order = Object.keys(DONORS);
+  const map = {};
+  (prizes || []).forEach((p, i) => {
+    const key = p.donor in DONORS ? p.donor : '';
+    (map[key] = map[key] || []).push({ p, i, ws: wins.filter((w) => w.pi === i) });
+  });
+  return order.filter((k) => map[k]).map((k) => ({ key: k, d: DONORS[k], items: map[k] }));
+}
+
+function render() {
+  if (!prizes || !prizes.length) {
+    document.getElementById('list').innerHTML = `<div class="none"><h3>이 브라우저에는 추첨 기록이 없어요</h3>
+      추첨 기록은 행사 때 <b>진행 화면을 띄운 노트북의 그 브라우저</b>에만 저장되어 있습니다.<br>
+      ① 그 노트북에서, ② 행사 때와 <b>같은 방식</b>으로 열어 주세요.<br>
+      · 폴더의 「송년의밤_진행화면.html」을 열었다면 → 이 파일을 <b>같은 폴더</b>에 두고 크롬으로 열기<br>
+      · 인터넷 주소로 열었다면 → 같은 주소의 <b>winners.html</b> 열기</div>`;
+    document.getElementById('stats').innerHTML = '';
+    return;
+  }
+  const gs = groups();
+  const drawable = prizes.filter((p) => +p.qty > 0);
+  const total = drawable.reduce((s, p) => s + (+p.qty), 0);
+  document.getElementById('stats').innerHTML =
+    `<div class="stat">경품<b>${drawable.length}</b>종</div><div class="stat">당첨<b>${wins.length}</b>명</div>` +
+    (total > wins.length ? `<div class="stat">미추첨<b>${total - wins.length}</b>개</div>` : '') +
+    `<div class="stat">협찬<b>${gs.filter((g) => g.key !== '').length}</b>분</div>`;
+  document.getElementById('toc').innerHTML = gs.map((g) =>
+    `<a href="#d-${g.key || 'club'}">${esc(sectionTitle(g))}${g.items.some((it) => +it.p.qty > 0) ? `<span>${g.items.reduce((s, it) => s + it.ws.length, 0)}</span>` : ''}</a>`).join('');
+  document.getElementById('list').innerHTML = gs.map(section).join('');
+}
+
+function sectionTitle(g) { return g.key === '' ? '한울회 준비 경품' : g.d.title + ' 협찬'; }
+
+function section(g) {
+  const n = g.items.reduce((s, it) => s + it.ws.length, 0);
+  const head = `<div class="dhead">
+      ${g.d.photo ? `<img src="${esc(g.d.photo)}" alt="${esc(g.d.title)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'seal',textContent:'✦'}))">` : `<div class="seal">✦</div>`}
+      <div class="dtitle"><div class="k">${g.key === '' ? 'Hanulhoe' : 'With Gratitude'}</div>
+        <h2>${esc(sectionTitle(g))}</h2>
+        <p>${g.items.some((it) => +it.p.qty > 0) ? `경품 ${g.items.filter((it) => +it.p.qty > 0).length}종 · 당첨 ${n}명` : '추첨 없이 한울회 전체를 위해 협찬'}</p></div></div>`;
+  const thanks = g.items.filter((it) => !(+it.p.qty > 0)).map((it) =>
+    `<div class="thanks">${esc(it.p.name)} — 한울회 전체를 위해 협찬해 주셨습니다<small>진심으로 감사드립니다</small></div>`).join('');
+  const cards = g.items.filter((it) => +it.p.qty > 0).map(card).join('');
+  return `<section class="donor" id="d-${g.key || 'club'}">${head}${thanks}${cards ? `<div class="grid">${cards}</div>` : ''}</section>`;
+}
+
+function card(it) {
+  const left = it.p.qty - it.ws.length;
+  const rows = it.ws.map((w) => `<li><b>${esc(w.name)}</b>${w.pos ? `<small>${esc(w.pos)}</small>` : ''}<span>${esc(shortAff(w.aff))}</span></li>`).join('');
+  return `<div class="prize"><div class="pname">${esc(it.p.name)}</div>
+    <div class="pmeta">${it.p.qty}개${left > 0 ? ` · <span class="warn">미추첨 ${left}개</span>` : ''}</div>
+    <ol>${rows || '<li class="empty">당첨자 없음</li>'}</ol></div>`;
+}
+
+function saveCsv() {
+  if (!prizes || !prizes.length) { alert('저장할 추첨 기록이 없습니다.'); return; }
+  const q = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lines = [['기증', '경품', '순번', '성명', '직위', '소속'].map(q).join(',')];
+  groups().forEach((g) => g.items.forEach((it) => {
+    if (!(+it.p.qty > 0)) { lines.push([sectionTitle(g), it.p.name, '', '(추첨 없음 · 전체 협찬)', '', ''].map(q).join(',')); return; }
+    it.ws.forEach((w, j) => lines.push([sectionTitle(g), it.p.name, j + 1, w.name, w.pos, shortAff(w.aff)].map(q).join(',')));
+    for (let j = it.ws.length; j < it.p.qty; j++) lines.push([sectionTitle(g), it.p.name, j + 1, '(미추첨)', '', ''].map(q).join(','));
+  }));
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });   // BOM → 엑셀에서 한글 깨짐 방지
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: '2026_송년의밤_경품당첨자.csv' });
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+render();
+</script>
+</body>
+</html>
