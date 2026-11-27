@@ -379,6 +379,7 @@ table.pz tr.don td{background:rgba(127,29,45,.12)}
   <button onclick="openModule('draw')">경품 추첨</button>
   <button onclick="openModule('gallery')">기증자 촬영</button>
   <button onclick="openModule('winners')">당첨자</button>
+  <button onclick="exportWinners()">명단 저장</button>
   <span class="sep"></span>
   <button onclick="openSetup()">⚙ 설정</button>
   <button onclick="toggleFs()">⛶ 전체화면</button>
@@ -1034,6 +1035,14 @@ function renderWinners() {
   const n = wins.length;
   $('#wList').style.fontSize = n > 40 ? '20px' : '';
   $('#wList').style.columns = n > 30 ? 4 : 3;
+}
+
+/* 당첨자 명단 페이지(기증자별 · 그림 저장 · CSV)로 추첨 기록을 넘겨서 새 탭으로 열기 — 기록은 읽기만 함 */
+function exportWinners() {
+  const data = btoa(unescape(encodeURIComponent(JSON.stringify({ prizes, wins }))));
+  const page = location.protocol === 'file:' ? '당첨자_명단.html' : 'winners.html';
+  const w = window.open(page + '#d=' + encodeURIComponent(data), '_blank');
+  if (!w) alert('팝업이 막혔습니다. 주소창 오른쪽의 팝업 차단 아이콘에서 허용한 뒤 다시 눌러 주세요.');
 }
 
 /* ═════════════ 설정 ═════════════ */

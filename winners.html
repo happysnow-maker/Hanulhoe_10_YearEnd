@@ -61,6 +61,19 @@ section.donor{margin:0 0 44px;border:1px solid var(--line2);border-radius:18px;o
 .dtitle .k{font-family:var(--latin);font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
 .dtitle h2{font-family:var(--serif);font-weight:700;font-size:28px;margin:4px 0 2px}
 .dtitle p{color:var(--mist);font-size:14px}
+.dhead .snap{margin-left:auto;font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:30px;border:1px solid var(--line);background:transparent;color:var(--gold-l);cursor:pointer}
+.dhead .snap:hover{background:rgba(239,217,159,.1)}
+.hint{max-width:760px;margin:0 auto 28px;border:1px solid var(--wine-l);border-radius:12px;padding:14px 18px;font-size:14px;line-height:1.8;color:#f3d4d8;background:rgba(127,29,45,.18)}
+.hint b{color:#fff}
+/* 그림 저장용 틀 */
+.snapbox{position:fixed;left:-10000px;top:0;width:1100px;padding:40px 40px 30px;background:linear-gradient(180deg,#0f2a1f,#06120d)}
+.snapbox .st{text-align:center;margin-bottom:24px}
+.snapbox .st .kicker{font-size:14px}
+.snapbox .st .t{font-family:var(--serif);font-weight:900;font-size:34px;color:var(--gold-l);margin-top:6px}
+.snapbox .st .s{color:var(--mist);font-size:14px;margin-top:4px}
+.snapbox section.donor{margin:0;background:linear-gradient(180deg,#123527,#0b2219)}
+.snapbox .grid{grid-template-columns:repeat(3,1fr)}
+.snapbox .ft{text-align:center;color:var(--mist);font-size:12px;margin-top:16px}
 .thanks{padding:26px;text-align:center;font-family:var(--serif);font-size:19px;color:var(--gold-l)}
 .thanks small{display:block;font-family:var(--sans);font-size:14px;color:var(--mist);margin-top:6px}
 
@@ -72,13 +85,13 @@ section.donor{margin:0 0 44px;border:1px solid var(--line2);border-radius:18px;o
 .pmeta{font-size:12.5px;color:var(--mist);margin:3px 0 12px}
 .pmeta .warn{color:var(--wine-l);font-weight:700}
 .prize ol{list-style:none;counter-reset:w}
-.prize li{counter-increment:w;display:flex;align-items:baseline;gap:10px;padding:7px 0;border-top:1px dashed var(--line2)}
-.prize li::before{content:counter(w);font-family:var(--latin);font-weight:600;color:var(--gold);min-width:18px;text-align:right;font-size:15px}
+.prize li{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-top:1px dashed var(--line2)}
+.prize li i{font-style:normal;font-family:var(--latin);font-weight:600;color:var(--gold);min-width:18px;text-align:right;font-size:15px}
 .prize li b{font-family:var(--serif);font-size:17px;font-weight:700;white-space:nowrap}
 .prize li small{color:var(--gold-l);font-size:12.5px;margin-left:4px}
 .prize li span{color:var(--mist);font-size:13px;margin-left:auto;text-align:right;word-break:keep-all}
 .prize li.empty{color:var(--mist);font-size:13.5px}
-.prize li.empty::before{content:'–'}
+
 
 /* 기록 없음 */
 .none{max-width:640px;margin:20px auto;border:1px solid var(--line);border-radius:16px;padding:30px;line-height:1.85;color:var(--mist);background:rgba(4,13,10,.45)}
@@ -95,12 +108,13 @@ footer{text-align:center;color:var(--mist);font-size:12.5px;margin-top:10px}
 
 /* 인쇄: 크림 바탕으로 잉크 절약, 섹션이 페이지에 걸쳐 끊기지 않게 */
 @media print{
+  .snap,.hint{display:none}
   @page{size:A4 portrait;margin:12mm}
   body{background:#fff;color:#24342c}
   .tools,.toc{display:none}
   .wrap{padding:0;max-width:none}
   h1{color:#123527;background:none;-webkit-text-fill-color:#123527}
-  .kicker,.dtitle .k,.prize li::before{color:#8a6624}
+  .kicker,.dtitle .k,.prize li i{color:#8a6624}
   .sub,.stat,.dtitle p,.pmeta,.prize li span,.thanks small{color:#5d6b63}
   .stat{border-color:#d8c99f}.stat b{color:#8a6624}
   section.donor{background:#fff;border-color:#d8c99f;break-inside:avoid-page;margin-bottom:16px}
@@ -115,6 +129,7 @@ footer{text-align:center;color:var(--mist);font-size:12.5px;margin-top:10px}
 </head>
 <body>
 <div class="tools">
+  <button onclick="saveAllPng()">🖼 기증자별 그림 저장</button>
   <button onclick="saveCsv()">엑셀(CSV) 저장</button>
   <button class="solid" onclick="print()">🖨 인쇄</button>
 </div>
@@ -131,6 +146,7 @@ footer{text-align:center;color:var(--mist);font-size:12.5px;margin-top:10px}
   <footer>진행 화면에 저장된 추첨 기록을 읽어 보여 줍니다 · 불참 처리된 분은 빠진 최종 당첨자</footer>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 /* 진행 화면(event_night.html)과 같은 기증자 정보 — 섹션 순서도 이 순서 */
 const DONORS = {
@@ -145,7 +161,15 @@ const LS = (k, d) => { try { const v = localStorage.getItem('hanul26n_' + k); re
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const shortAff = (a) => String(a || '').replace(/부총장\((서울|ERICA)\)\s*/, '').replace(/^총장\s+/, '').trim();
 
-let prizes = LS('prizes', null), wins = LS('wins', []);
+let prizes = LS('prizes', null), wins = LS('wins', []), fromStage = false;
+// 진행 화면의 「명단 저장」 버튼으로 열면 주소(#d=…)에 담겨 온 기록을 우선 사용 — 브라우저·여는 방식이 달라도 확실함
+try {
+  const m = location.hash.match(/[#&]d=([^&]+)/);
+  if (m) {
+    const d = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
+    if (d && Array.isArray(d.prizes)) { prizes = d.prizes; wins = Array.isArray(d.wins) ? d.wins : []; fromStage = true; }
+  }
+} catch (e) { console.warn('전달된 기록을 읽지 못했습니다', e); }
 
 // 미리보기용 예시 (주소 끝에 ?demo) — 실제 기록에는 영향 없음
 if (/[?&]demo\b/.test(location.search)) {
@@ -182,6 +206,10 @@ function render() {
     return;
   }
   const gs = groups();
+  document.querySelector('.hint')?.remove();
+  if (!wins.length) document.getElementById('toc').insertAdjacentHTML('beforebegin', `<div class="hint"><b>경품 목록은 있는데 당첨 기록이 비어 있어요.</b><br>
+    리허설 때 기록이 남은 다른 저장 공간을 보고 있는 것 같아요. 당첨자가 보이는 <b>진행 화면</b>을 열고,
+    화면 아래 메뉴의 <b>「명단 저장」</b>을 누르면 실제 당첨 기록으로 이 화면이 열립니다.</div>`);
   const drawable = prizes.filter((p) => +p.qty > 0);
   const total = drawable.reduce((s, p) => s + (+p.qty), 0);
   document.getElementById('stats').innerHTML =
@@ -201,7 +229,8 @@ function section(g) {
       ${g.d.photo ? `<img src="${esc(g.d.photo)}" alt="${esc(g.d.title)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'seal',textContent:'✦'}))">` : `<div class="seal">✦</div>`}
       <div class="dtitle"><div class="k">${g.key === '' ? 'Hanulhoe' : 'With Gratitude'}</div>
         <h2>${esc(sectionTitle(g))}</h2>
-        <p>${g.items.some((it) => +it.p.qty > 0) ? `경품 ${g.items.filter((it) => +it.p.qty > 0).length}종 · 당첨 ${n}명` : '추첨 없이 한울회 전체를 위해 협찬'}</p></div></div>`;
+        <p>${g.items.some((it) => +it.p.qty > 0) ? `경품 ${g.items.filter((it) => +it.p.qty > 0).length}종 · 당첨 ${n}명` : '추첨 없이 한울회 전체를 위해 협찬'}</p></div>
+      <button class="snap" data-html2canvas-ignore onclick="savePng('${g.key || 'club'}')">🖼 그림 저장</button></div>`;
   const thanks = g.items.filter((it) => !(+it.p.qty > 0)).map((it) =>
     `<div class="thanks">${esc(it.p.name)} — 한울회 전체를 위해 협찬해 주셨습니다<small>진심으로 감사드립니다</small></div>`).join('');
   const cards = g.items.filter((it) => +it.p.qty > 0).map(card).join('');
@@ -210,10 +239,10 @@ function section(g) {
 
 function card(it) {
   const left = it.p.qty - it.ws.length;
-  const rows = it.ws.map((w) => `<li><b>${esc(w.name)}</b>${w.pos ? `<small>${esc(w.pos)}</small>` : ''}<span>${esc(shortAff(w.aff))}</span></li>`).join('');
+  const rows = it.ws.map((w, j) => `<li><i>${j + 1}</i><b>${esc(w.name)}</b>${w.pos ? `<small>${esc(w.pos)}</small>` : ''}<span>${esc(shortAff(w.aff))}</span></li>`).join('');
   return `<div class="prize"><div class="pname">${esc(it.p.name)}</div>
     <div class="pmeta">${it.p.qty}개${left > 0 ? ` · <span class="warn">미추첨 ${left}개</span>` : ''}</div>
-    <ol>${rows || '<li class="empty">당첨자 없음</li>'}</ol></div>`;
+    <ol>${rows || '<li class="empty"><i>–</i>당첨자 없음</li>'}</ol></div>`;
 }
 
 function saveCsv() {
@@ -228,6 +257,44 @@ function saveCsv() {
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });   // BOM → 엑셀에서 한글 깨짐 방지
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: '2026_송년의밤_경품당첨자.csv' });
   document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ── 기증자별 그림(PNG) 저장 ── */
+async function snapCanvas(key) {
+  const sec = document.getElementById('d-' + key);
+  if (!sec || !window.html2canvas) throw new Error(window.html2canvas ? '섹션을 찾지 못했습니다' : '그림 저장 도구를 불러오지 못했습니다 (인터넷 연결 확인)');
+  const box = document.createElement('div');
+  box.className = 'snapbox';
+  box.innerHTML = `<div class="st"><div class="kicker">Lucky Draw · Winners</div><div class="t">2026 송년의 밤 경품 당첨자</div>
+    <div class="s">2026 한울회 정기총회 및 송년의 밤 · 2026. 11. 25 (수)</div></div>`;
+  box.appendChild(sec.cloneNode(true));
+  box.insertAdjacentHTML('beforeend', '<div class="ft">제41대 한울회</div>');
+  document.body.appendChild(box);
+  try {
+    await Promise.all([...box.querySelectorAll('img')].map((im) => im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; })));
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    return await html2canvas(box, { scale: 2, backgroundColor: '#06120d', useCORS: true, logging: false });
+  } finally { box.remove(); }
+}
+function fileName(key) {
+  const g = groups().find((x) => (x.key || 'club') === key);
+  return '2026_송년의밤_당첨자_' + (g ? sectionTitle(g) : key).replace(/\s+/g, '_') + '.png';
+}
+function download(canvas, name) {
+  return new Promise((res) => canvas.toBlob((b) => {
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(b), download: name });
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(res, 400);
+  }, 'image/png'));
+}
+async function savePng(key) {
+  try { await download(await snapCanvas(key), fileName(key)); }
+  catch (e) { alert('그림 저장에 실패했습니다: ' + e.message); }
+}
+async function saveAllPng() {
+  if (!prizes || !prizes.length) { alert('저장할 추첨 기록이 없습니다.'); return; }
+  const keys = groups().map((g) => g.key || 'club');
+  if (!confirm(`기증자별 그림 ${keys.length}장을 저장합니다.\n크롬이 "여러 파일 다운로드"를 물으면 「허용」을 눌러 주세요.`)) return;
+  for (const k of keys) await savePng(k);
 }
 
 render();
