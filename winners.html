@@ -72,7 +72,14 @@ section.donor{margin:0 0 44px;border:1px solid var(--line2);border-radius:18px;o
 .snapbox .st .t{font-family:var(--serif);font-weight:900;font-size:34px;color:var(--gold-l);margin-top:6px}
 .snapbox .st .s{color:var(--mist);font-size:14px;margin-top:4px}
 .snapbox section.donor{margin:0;background:linear-gradient(180deg,#123527,#0b2219)}
-.snapbox .grid{grid-template-columns:repeat(3,1fr)}
+.snapbox .grid{grid-template-columns:repeat(3,1fr) !important;padding:22px 26px 26px !important}
+.snapbox .dhead{padding:22px 26px !important}
+.snapbox .dhead img{height:118px !important;width:auto !important}
+.snapbox.whole{width:1200px;padding:56px 48px 40px}
+.snapbox.whole .st .t{font-size:46px;color:#e9c97a}
+.snapbox.whole .orn{margin-top:14px}
+.snapbox.whole .stats{margin-top:18px}
+.snapbox.whole section.donor{margin:0 0 22px}
 .snapbox .ft{text-align:center;color:var(--mist);font-size:12px;margin-top:16px}
 .thanks{padding:26px;text-align:center;font-family:var(--serif);font-size:19px;color:var(--gold-l)}
 .thanks small{display:block;font-family:var(--sans);font-size:14px;color:var(--mist);margin-top:6px}
@@ -129,6 +136,7 @@ footer{text-align:center;color:var(--mist);font-size:12.5px;margin-top:10px}
 </head>
 <body>
 <div class="tools">
+  <button onclick="saveWholePng()">🖼 전체 명단 그림 저장</button>
   <button onclick="saveAllPng()">🖼 기증자별 그림 저장</button>
   <button onclick="saveCsv()">엑셀(CSV) 저장</button>
   <button class="solid" onclick="print()">🖨 인쇄</button>
@@ -261,13 +269,18 @@ function saveCsv() {
 
 /* ── 기증자별 그림(PNG) 저장 ── */
 async function snapCanvas(key) {
-  const sec = document.getElementById('d-' + key);
-  if (!sec || !window.html2canvas) throw new Error(window.html2canvas ? '섹션을 찾지 못했습니다' : '그림 저장 도구를 불러오지 못했습니다 (인터넷 연결 확인)');
+  const whole = key === '*';
+  const secs = whole ? [...document.querySelectorAll('section.donor')] : [document.getElementById('d-' + key)].filter(Boolean);
+  if (!secs.length || !window.html2canvas) throw new Error(window.html2canvas ? '섹션을 찾지 못했습니다' : '그림 저장 도구를 불러오지 못했습니다 (인터넷 연결 확인)');
   const box = document.createElement('div');
-  box.className = 'snapbox';
-  box.innerHTML = `<div class="st"><div class="kicker">Lucky Draw · Winners</div><div class="t">2026 송년의 밤 경품 당첨자</div>
-    <div class="s">2026 한울회 정기총회 및 송년의 밤 · 2026. 11. 25 (수)</div></div>`;
-  box.appendChild(sec.cloneNode(true));
+  box.className = 'snapbox' + (whole ? ' whole' : '');
+  box.innerHTML = whole
+    ? `<div class="st"><div class="kicker">Lucky Draw · Winners</div><div class="t">경품 당첨을 축하드립니다</div>
+       <div class="s">2026 한울회 정기총회 및 송년의 밤 · 2026. 11. 25 (수) · 르스타일</div>
+       <div class="orn"><i></i>✦<i></i></div><div class="stats">${document.getElementById('stats').innerHTML}</div></div>`
+    : `<div class="st"><div class="kicker">Lucky Draw · Winners</div><div class="t">2026 송년의 밤 경품 당첨자</div>
+       <div class="s">2026 한울회 정기총회 및 송년의 밤 · 2026. 11. 25 (수)</div></div>`;
+  secs.forEach((sec) => box.appendChild(sec.cloneNode(true)));
   box.insertAdjacentHTML('beforeend', '<div class="ft">제41대 한울회</div>');
   document.body.appendChild(box);
   try {
@@ -288,6 +301,11 @@ function download(canvas, name) {
 }
 async function savePng(key) {
   try { await download(await snapCanvas(key), fileName(key)); }
+  catch (e) { alert('그림 저장에 실패했습니다: ' + e.message); }
+}
+async function saveWholePng() {
+  if (!prizes || !prizes.length) { alert('저장할 추첨 기록이 없습니다.'); return; }
+  try { await download(await snapCanvas('*'), '2026_송년의밤_경품당첨자_전체.png'); }
   catch (e) { alert('그림 저장에 실패했습니다: ' + e.message); }
 }
 async function saveAllPng() {
